@@ -10,19 +10,24 @@
 </head>
 <body>
 
+<div class="bg-deco" aria-hidden="true">
+  <div class="orb a"></div><div class="orb b"></div><div class="orb c"></div>
+  <div class="grid"></div>
+</div>
+
 <header class="topbar">
   <div class="topbar-inner">
+    <button class="menu-btn" id="menu-btn" aria-label="開啟目錄">
+      <span></span><span></span><span></span>
+    </button>
     <div class="brand">
       <div class="logo">⚛</div>
       <div>DSE 化學溫習站<small>HKDSE Chemistry Revision Hub</small></div>
     </div>
-    <nav class="navlinks">
-      <button data-nav="pt">元素週期表</button>
-      <button data-nav="notes">知識點</button>
-      <button data-nav="quiz">練習題</button>
-      <button data-nav="calc">元素計算器</button>
-      <button data-nav="series">活性序 / 電化序</button>
-    </nav>
+    <div class="topsearch" id="topsearch">
+      <input type="text" id="gsearch" placeholder="搜尋元素 / 詞條…" autocomplete="off">
+      <div class="gs-panel" id="gs-panel"></div>
+    </div>
     <button class="icon-btn" id="theme-btn" title="切換深／淺色">🌓</button>
   </div>
 </header>
@@ -31,25 +36,39 @@
 
   <!-- ============ 元素週期表 ============ -->
   <section class="view active" id="view-pt">
-    <div class="page-head">
-      <h1>互動元素週期表</h1>
+    <div class="hero">
+      <svg class="hero-art" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+        <g class="atom-spin">
+          <ellipse cx="100" cy="100" rx="82" ry="34" stroke="#5aa9ff" stroke-width="1.6" opacity=".7"/>
+          <ellipse cx="100" cy="100" rx="82" ry="34" stroke="#8b6cff" stroke-width="1.6" opacity=".7" transform="rotate(60 100 100)"/>
+          <ellipse cx="100" cy="100" rx="82" ry="34" stroke="#2ce0c0" stroke-width="1.6" opacity=".7" transform="rotate(120 100 100)"/>
+          <circle cx="182" cy="100" r="6" fill="#5aa9ff"/>
+          <circle cx="41" cy="129" r="6" fill="#8b6cff"/>
+          <circle cx="159" cy="41" r="6" fill="#2ce0c0"/>
+        </g>
+        <circle cx="100" cy="100" r="15" fill="url(#ng)"/>
+        <defs><radialGradient id="ng"><stop offset="0" stop-color="#ffb59a"/><stop offset="1" stop-color="#e2543f"/></radialGradient></defs>
+      </svg>
+      <h1>⚛ 互動元素週期表</h1>
       <p>點擊任何一個元素，即可看到它的玻爾原子模型、電子排布、氧化態與 DSE 重點。</p>
     </div>
 
     <div class="card" style="margin-bottom:14px">
+      <div class="card-title"><span class="ic">📈</span>溫習進度</div>
       <div class="stat-grid" id="stats"></div>
-      <div class="btn-row" style="margin-top:12px">
+      <div class="btn-row" style="margin-top:13px">
         <button class="btn sm ghost" id="reset-progress">重設溫習紀錄</button>
         <span style="color:var(--muted);font-size:12px;align-self:center">紀錄只儲存在你自己的瀏覽器</span>
       </div>
     </div>
 
+    <div class="quick-row" id="quick-row"></div>
     <div class="pt-legend" id="pt-legend"></div>
     <div class="pt-wrap"><div class="pt" id="pt"></div></div>
 
     <div class="grid grid-2" style="margin-top:16px">
       <div class="card">
-        <h3 style="margin:0 0 8px;font-size:15px">原子模型怎樣看？</h3>
+        <div class="card-title"><span class="ic">🔬</span>原子模型怎樣看？</div>
         <p style="margin:0;font-size:13.5px;color:var(--muted)">
           模型以「電子層（玻爾模型）」表示：中心是原子核（標示質子數 p⁺ 與中子數 n），
           每一圈軌道代表一個電子層，藍色小球電子會沿軌道轉動。
@@ -57,9 +76,9 @@
         </p>
       </div>
       <div class="card">
-        <h3 style="margin:0 0 8px;font-size:15px">溫習小提示</h3>
-        <ul style="margin:0;padding-left:20px;font-size:13.5px;color:var(--muted)">
-          <li>週期數 ＝ 電子層數；主族的族數 ＝ 價電子數。</li>
+        <div class="card-title"><span class="ic">💡</span>溫習小提示</div>
+        <ul class="tip-list">
+          <li><b>週期數 ＝ 電子層數</b>；主族的族數 ＝ 價電子數。</li>
           <li>點擊元素後可按「☆ 標記為重點」，方便考前集中溫習。</li>
           <li>配合「知識點」頁搜尋「電負性」「離子鍵」等詞條一起使用。</li>
         </ul>
@@ -69,8 +88,17 @@
 
   <!-- ============ 知識點 ============ -->
   <section class="view" id="view-notes">
-    <div class="page-head">
-      <h1>知識點速查</h1>
+    <div class="hero" style="background:linear-gradient(135deg,rgba(139,108,255,.18),rgba(44,224,192,.13) 55%,rgba(90,169,255,.12))">
+      <svg class="hero-art" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+        <g class="atom-spin-rev" opacity=".85">
+          <path d="M100 30 L152 60 L152 120 L100 150 L48 120 L48 60 Z" stroke="#8b6cff" stroke-width="1.8"/>
+          <path d="M100 30 L100 150" stroke="#2ce0c0" stroke-width="1.4" opacity=".6"/>
+        </g>
+        <circle cx="100" cy="30" r="7" fill="#8b6cff" class="pulse-dot"/>
+        <circle cx="152" cy="120" r="7" fill="#2ce0c0" class="pulse-dot"/>
+        <circle cx="48" cy="60" r="7" fill="#5aa9ff" class="pulse-dot"/>
+      </svg>
+      <h1>📚 知識點速查</h1>
       <p>共 <b id="note-count">—</b> 個詞條，涵蓋 DSE 十二個必修課題。點開可看定義、實例與考試提示。</p>
     </div>
     <div class="searchbar"><input type="text" id="note-search" placeholder="搜尋詞條，例如：取代反應、電負性、赫斯定律…"></div>
@@ -80,13 +108,23 @@
 
   <!-- ============ 練習題 ============ -->
   <section class="view" id="view-quiz">
-    <div class="page-head">
-      <h1>練習題（可無限刷新）</h1>
+    <div class="hero" style="background:linear-gradient(135deg,rgba(255,140,180,.16),rgba(139,108,255,.15) 50%,rgba(90,169,255,.13))">
+      <svg class="hero-art" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+        <g class="dash-flow">
+          <circle cx="100" cy="100" r="66" stroke="#ff8cb4" stroke-width="2" opacity=".7"/>
+        </g>
+        <circle cx="100" cy="100" r="46" stroke="#8b6cff" stroke-width="1.6" class="dash-flow" opacity=".6"/>
+        <g class="atom-spin">
+          <rect x="88" y="62" width="24" height="76" rx="6" stroke="#5aa9ff" stroke-width="1.8"/>
+        </g>
+        <path d="M92 118 L100 130 L112 104" stroke="#2ce0c0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h1>✏️ 練習題（可無限刷新）</h1>
       <p>內建精選題庫＋AI 出題引擎：每按一次「刷新題目」就會產生一批全新的題目，答完即看解析與得分。</p>
     </div>
 
     <div class="card" style="margin-bottom:14px">
-      <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px">選擇課題（可多選，不選即全部）</div>
+      <div style="font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.3px;margin-bottom:7px">選擇課題（可多選，不選即全部）</div>
       <div class="chips" id="quiz-topics"></div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
         <label class="field" style="flex:1;min-width:120px;margin:0">
@@ -126,14 +164,24 @@
 
   <!-- ============ 元素計算器 ============ -->
   <section class="view" id="view-calc">
-    <div class="page-head">
-      <h1>元素計算器</h1>
+    <div class="hero" style="background:linear-gradient(135deg,rgba(44,224,192,.15),rgba(90,169,255,.14) 50%,rgba(52,211,153,.12))">
+      <svg class="hero-art" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+        <rect x="34" y="52" width="132" height="104" rx="16" stroke="#2ce0c0" stroke-width="2" opacity=".7"/>
+        <g class="dash-flow"><path d="M34 92 H166" stroke="#5aa9ff" stroke-width="1.6"/></g>
+        <circle cx="62" cy="76" r="7" fill="#5aa9ff" class="pulse-dot"/>
+        <circle cx="94" cy="76" r="7" fill="#8b6cff" class="pulse-dot"/>
+        <circle cx="126" cy="76" r="7" fill="#2ce0c0" class="pulse-dot"/>
+        <circle cx="62" cy="118" r="7" fill="#34d399" class="pulse-dot"/>
+        <circle cx="94" cy="118" r="7" fill="#fbbf24" class="pulse-dot"/>
+        <circle cx="126" cy="118" r="7" fill="#ff8cb4" class="pulse-dot"/>
+      </svg>
+      <h1>🧮 元素計算器</h1>
       <p>摩爾質量、摩爾換算、實驗式、溶液濃度——全部按 DSE 常用的相對原子質量計算。</p>
     </div>
 
     <div class="grid grid-2">
       <div class="card">
-        <h3 style="margin:0 0 10px;font-size:15px">① 摩爾質量 / 質量百分比</h3>
+        <div class="card-title"><span class="ic">⚖️</span>① 摩爾質量 / 質量百分比</div>
         <label class="field"><span>化學式（如 H2O、Ca(OH)2、CuSO4.5H2O）</span>
           <input type="text" id="c-formula" value="CuSO4.5H2O"></label>
         <button class="btn sm" id="c-go">計算</button>
@@ -141,7 +189,7 @@
       </div>
 
       <div class="card">
-        <h3 style="margin:0 0 10px;font-size:15px">② 摩爾換算（質量 ↔ 摩爾 ↔ 粒子數 ↔ 氣體體積）</h3>
+        <div class="card-title"><span class="ic">🔄</span>② 摩爾換算（質量 ↔ 摩爾 ↔ 粒子數 ↔ 氣體體積）</div>
         <label class="field"><span>化學式</span><input type="text" id="m-formula" value="CO2"></label>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <label class="field" style="flex:1;min-width:110px"><span>質量 / g</span><input type="number" id="m-mass" placeholder="留空"></label>
@@ -154,7 +202,7 @@
       </div>
 
       <div class="card">
-        <h3 style="margin:0 0 10px;font-size:15px">③ 實驗式</h3>
+        <div class="card-title"><span class="ic">🧪</span>③ 實驗式</div>
         <div id="e-rows">
           <div class="e-row" style="display:flex;gap:8px;margin-bottom:8px">
             <input type="text" class="e-sym" placeholder="如 Fe" value="Fe">
@@ -170,7 +218,7 @@
       </div>
 
       <div class="card">
-        <h3 style="margin:0 0 10px;font-size:15px">④ 溶液濃度 / 稀釋</h3>
+        <div class="card-title"><span class="ic">💧</span>④ 溶液濃度 / 稀釋</div>
         <label class="field"><span>模式</span>
           <select id="s-mode">
             <option value="cv">求濃度 c = n ÷ V</option>
@@ -192,18 +240,26 @@
 
   <!-- ============ 活性序 / 電化序 ============ -->
   <section class="view" id="view-series">
-    <div class="page-head">
-      <h1>金屬活性序 與 電化序</h1>
+    <div class="hero" style="background:linear-gradient(135deg,rgba(251,191,36,.15),rgba(255,140,180,.13) 50%,rgba(90,169,255,.13))">
+      <svg class="hero-art" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+        <g class="dash-flow"><path d="M40 150 L160 60" stroke="#fbbf24" stroke-width="2.4"/></g>
+        <circle cx="40" cy="150" r="9" fill="#fbbf24" class="pulse-dot"/>
+        <circle cx="100" cy="105" r="9" fill="#ff8cb4" class="pulse-dot"/>
+        <circle cx="160" cy="60" r="9" fill="#5aa9ff" class="pulse-dot"/>
+        <path d="M52 168 H172" stroke="#8b6cff" stroke-width="1.6" opacity=".6"/>
+        <path d="M52 168 V60" stroke="#2ce0c0" stroke-width="1.6" opacity=".6"/>
+      </svg>
+      <h1>🔋 金屬活性序 與 電化序</h1>
       <p>兩者其實是同一件事的兩個版本：活性序是定性排列，電化序則用標準電極電勢 E° 定量標示。</p>
     </div>
 
     <div class="grid grid-2">
-      <div class="card"><h3 style="margin:0 0 10px;font-size:15px">金屬活性序（愈高愈活潑）</h3><div id="rs-table"></div></div>
-      <div class="card"><h3 style="margin:0 0 10px;font-size:15px">電化序（標準電極電勢）</h3><div id="ec-table"></div></div>
+      <div class="card"><div class="card-title"><span class="ic">🔥</span>金屬活性序（愈高愈活潑）</div><div id="rs-table"></div></div>
+      <div class="card"><div class="card-title"><span class="ic">⚡</span>電化序（標準電極電勢）</div><div id="ec-table"></div></div>
     </div>
 
     <div class="card" style="margin-top:14px">
-      <h3 style="margin:0 0 4px;font-size:15px">小遊戲：排出活性序</h3>
+      <div class="card-title"><span class="ic">🎮</span>小遊戲：排出活性序</div>
       <p style="margin:0 0 10px;font-size:13px;color:var(--muted)">用 ↑ ↓ 或拖曳把五種金屬由「最活潑」排到「最不活潑」。</p>
       <div id="game-list"></div>
       <div class="btn-row"><button class="btn sm" id="game-check">核對答案</button><button class="btn sm ghost" id="game-new">換一批</button></div>
@@ -211,7 +267,7 @@
     </div>
 
     <div class="card" style="margin-top:14px">
-      <h3 style="margin:0 0 8px;font-size:15px">記憶口訣</h3>
+      <div class="card-title"><span class="ic">🧠</span>記憶口訣</div>
       <p style="margin:0;font-size:13.5px">
         <b>活性序：</b>鉀 鈉 鈣 鎂 鋁 （碳） 鋅 鐵 鉛 （氫） 銅 銀 金<br>
         英文：<i>Please Stop Calling Me A Careless Zebra Instead Try Learning How Copper Saves Gold</i><br>
@@ -227,15 +283,27 @@
   </p>
 </main>
 
-<nav class="tabbar">
-  <div class="row">
-    <button data-nav="pt"><span class="ic">⚛️</span>週期表</button>
-    <button data-nav="notes"><span class="ic">📚</span>知識點</button>
-    <button data-nav="quiz"><span class="ic">✏️</span>練習題</button>
-    <button data-nav="calc"><span class="ic">🧮</span>計算器</button>
-    <button data-nav="series"><span class="ic">🔋</span>活性序</button>
+<!-- 右下角懸浮目錄按鈕（手機／平板單手可及） -->
+<button class="fab" id="fab" aria-label="開啟目錄">☰</button>
+
+<div class="drawer-bg" id="drawer-bg"></div>
+<aside class="drawer" id="drawer" aria-label="功能目錄">
+  <div class="drawer-head">
+    <div class="logo">⚛</div>
+    <div class="dh-txt">
+      <b>功能目錄</b>
+      <small>點選即可切換功能</small>
+    </div>
+    <button class="close-btn" id="drawer-close" aria-label="關閉目錄">✕</button>
   </div>
-</nav>
+  <nav class="drawer-nav" id="drawer-nav"></nav>
+  <div class="drawer-foot">
+    <button class="dfoot-btn" id="drawer-theme">🌓 切換深／淺色</button>
+    <button class="dfoot-btn" id="drawer-ai">⚙ AI 接口設定</button>
+    <button class="dfoot-btn danger" id="drawer-reset">🗑 重設溫習紀錄</button>
+    <div class="drawer-ver">HKDSE Chemistry Revision Hub</div>
+  </div>
+</aside>
 
 <div class="modal-bg" id="modal-bg">
   <div class="modal" id="modal"><div id="modal-body"></div></div>
