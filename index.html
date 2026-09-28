@@ -134,31 +134,71 @@ header{
   font-family:inherit;font-size:14px;color:var(--tx)}
 .hsearch input::placeholder{color:var(--mu2)}
 
-/* ══ 3. 模式切換列 ═════════════════════════════════════════ */
-.subnav{
-  position:sticky;top:60px;z-index:70;
-  border-top:1px solid var(--bd);background:var(--card);
-  box-shadow:0 2px 8px rgba(16,24,40,.04);
+/* ══ 3. 左上角目錄按鈕 + 左側抽屜 ═════════════════════════ */
+.nav-btn{
+  width:38px;height:38px;flex:0 0 38px;border:1px solid var(--bd);background:var(--card);
+  border-radius:10px;cursor:pointer;display:grid;place-items:center;
+  transition:.15s;font-family:inherit;
 }
-.subnav .in{
-  max-width:1180px;margin:0 auto;padding:7px 18px;
-  display:flex;gap:8px;align-items:center;
-  overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;
+.nav-btn:hover{border-color:#cbd2dc;background:var(--bg)}
+.nav-btn:active{transform:translateY(1px)}
+.nav-btn .bars{
+  width:17px;height:2px;border-radius:2px;background:#374151;position:relative;
+  display:block;transition:.18s;
 }
-.subnav .in::-webkit-scrollbar{display:none}
-.snlab{
-  font-size:11px;font-weight:700;color:var(--mu);letter-spacing:.5px;flex-shrink:0;
-  padding-right:8px;border-right:1px solid var(--bd);
+.nav-btn .bars::before,.nav-btn .bars::after{
+  content:"";position:absolute;left:0;width:17px;height:2px;border-radius:2px;
+  background:#374151;transition:.18s;
 }
-.schip{
-  flex-shrink:0;padding:6px 14px;border-radius:999px;border:1px solid var(--bd);
-  background:var(--card);font-size:13.5px;cursor:pointer;font-family:inherit;
-  color:#4b5563;white-space:nowrap;transition:.15s;font-weight:650;
-  display:inline-flex;align-items:center;gap:6px;
+.nav-btn .bars::before{top:-6px}
+.nav-btn .bars::after{top:6px}
+.nav-btn.on{background:var(--pr);border-color:var(--pr)}
+.nav-btn.on .bars{background:transparent}
+.nav-btn.on .bars::before{top:0;transform:rotate(45deg);background:#fff}
+.nav-btn.on .bars::after{top:0;transform:rotate(-45deg);background:#fff}
+
+.drawer-mask{
+  position:fixed;inset:0;z-index:150;background:rgba(16,24,40,.40);
+  opacity:0;pointer-events:none;transition:opacity .24s;
 }
-.schip:hover{border-color:#cbd2dc;background:var(--bg)}
-.schip.on{background:var(--tx);color:#fff;border-color:var(--tx);font-weight:700}
-.schip .ic{font-size:13px}
+.drawer-mask.on{opacity:1;pointer-events:auto}
+
+.drawer{
+  position:fixed;left:0;top:0;bottom:0;z-index:160;
+  width:290px;max-width:84vw;background:var(--card);
+  border-right:1px solid var(--bd);
+  box-shadow:8px 0 32px rgba(16,24,40,.14);
+  transform:translateX(-100%);transition:transform .26s cubic-bezier(.3,.9,.4,1);
+  display:flex;flex-direction:column;
+}
+.drawer.on{transform:none}
+.dw-head{
+  display:flex;align-items:center;gap:10px;padding:14px 16px;
+  border-bottom:1px solid var(--bd);flex-shrink:0;
+}
+.dw-title{font-size:14px;font-weight:750;flex:1;letter-spacing:-.2px}
+.dw-list{flex:1;overflow-y:auto;padding:8px 10px 12px}
+.dw-item{
+  width:100%;display:flex;align-items:center;gap:11px;
+  padding:11px 12px;border:none;background:none;border-radius:10px;
+  cursor:pointer;font-family:inherit;font-size:14.5px;color:#374151;
+  text-align:left;transition:.14s;margin-bottom:2px;font-weight:650;
+}
+.dw-item:hover{background:var(--bg)}
+.dw-item .ic{
+  width:30px;height:30px;flex:0 0 30px;border-radius:8px;font-size:15px;
+  display:grid;place-items:center;background:var(--bg);
+}
+.dw-item .tx{flex:1}
+.dw-item .tx small{display:block;font-size:11.5px;color:var(--mu);font-weight:600;margin-top:1px}
+.dw-item.on{background:var(--prs);color:var(--prd);font-weight:750}
+.dw-item.on .ic{background:#fff}
+.dw-item.on .tx small{color:var(--pr)}
+.dw-foot{
+  padding:11px 16px;border-top:1px solid var(--bd);font-size:11.5px;color:var(--mu);
+  flex-shrink:0;line-height:1.6;
+}
+body.dw-open{overflow:hidden}
 
 /* ══ 4. 科目頭卡 ═══════════════════════════════════════════ */
 .shead{
@@ -507,12 +547,13 @@ input[type=range]::-moz-range-thumb{
 .g-note{font-family:var(--font);font-size:11px;fill:#b45309;font-weight:650}
 .r-node{cursor:pointer}
 .r-node rect{transition:.18s}
-.r-node:hover rect{filter:drop-shadow(0 4px 10px rgba(13,148,136,.4))}
-.r-label{font-family:var(--font);font-size:13.5px;font-weight:750;fill:#fff;pointer-events:none}
-.r-sub{font-family:var(--mono);font-size:10.5px;fill:rgba(255,255,255,.92);pointer-events:none}
-.r-edge{stroke:#94a3b8;stroke-width:2;fill:none}
-.r-edge.back{stroke:#d97706;stroke-dasharray:6 4}
-.r-tag{font-family:var(--font);font-size:11px;fill:#4b5563;font-weight:650}
+.r-node:hover rect{filter:drop-shadow(0 4px 10px rgba(217,119,6,.4))}
+.r-label{font-family:var(--font);font-size:13.5px;font-weight:750;fill:#141922;pointer-events:none}
+.r-sub{font-family:var(--mono);font-size:10.5px;fill:#6b7280;pointer-events:none}
+.r-center-badge{font-family:var(--font);font-size:10.5px;font-weight:800;fill:#b45309;pointer-events:none}
+.r-edge{stroke-width:2.2;fill:none}
+.r-tag-name{font-family:var(--font);font-size:12px;font-weight:750}
+.r-tag-re{font-family:var(--font);font-size:11px;fill:#4b5563;font-weight:600}
 .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:12.5px;color:var(--mu);font-weight:600}
 .legend i{display:inline-block;width:22px;height:3px;vertical-align:middle;margin-right:7px;border-radius:3px}
 
@@ -560,7 +601,8 @@ input[type=range]::-moz-range-thumb{
 
 /* ══ 18. 模態框 ═══════════════════════════════════════════ */
 .modal{
-  position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;
+  position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
+  padding:18px;background:rgba(16,24,40,.42);animation:fi .2s;display:flex;align-items:center;justify-content:center;
   padding:18px;background:rgba(16,24,40,.42);animation:fi .2s;
 }
 .modal-box{
@@ -587,9 +629,24 @@ input[type=range]::-moz-range-thumb{
 .close-btn:hover{color:var(--er);background:var(--erbg);border-color:#fecaca}
 .atom-box{
   border-radius:var(--r);padding:13px;text-align:center;margin-bottom:15px;
-  background:#f8fafc;border:1px solid var(--bd);
+  background:radial-gradient(circle at 50% 50%,#f0fdfa 0%,#f8fafc 70%);
+  border:1px solid var(--bd);cursor:pointer;transition:.15s;
 }
+.atom-box:hover{border-color:#99f6e4}
 .atom-svg{width:100%;max-width:300px;height:auto}
+
+/* 電子繞核旋轉 */
+.orbit{
+  transform-box:view-box;
+  transform-origin:150px 150px;
+  will-change:transform;
+}
+@keyframes orbit{
+  from{transform:rotate(0deg)}
+  to{transform:rotate(360deg)}
+}
+/* 點擊原子圖可暫停旋轉 */
+.atom-svg.paused .orbit{animation-play-state:paused!important}
 .atom-cap{font-size:12.5px;color:var(--mu);margin-top:5px;font-weight:650}
 .info-grid{
   display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:15px;
@@ -659,11 +716,8 @@ footer{
   body{font-size:15.5px}
   .wrap{padding:0 14px}
   .hd{height:58px;gap:10px}
-  .subnav{top:58px}
-  .subnav .in{padding:8px 14px;gap:7px}
   .brand small{display:none}
   .brand b{font-size:14.5px}
-  .snlab{display:none}
   .shead{padding:17px 18px;gap:16px;margin:15px 0 13px}
   .ring{width:74px;height:74px}
   .ring i{width:58px;height:58px;font-size:16px}
@@ -683,14 +737,12 @@ footer{
 @media (max-width:560px){
   body{font-size:16px}
   .hd{height:56px}
-  .subnav{top:56px}
   .brand .mk{width:30px;height:30px;flex:0 0 30px;font-size:11px}
   .brand b{font-size:14px}
   .cd{padding:5px 12px}
   .cd b{font-size:17px}
   .cd small{font-size:10.5px}
   .ib{width:34px;height:34px;flex:0 0 34px;font-size:14px}
-  .schip{padding:7px 13px;font-size:13px}
   .chip{padding:6px 12px;font-size:12.5px;min-height:32px}
   .btn{padding:9px 15px;font-size:13.5px}
   .btn.sm{padding:6px 11px;font-size:12.5px}
@@ -722,10 +774,11 @@ footer{
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
   html{scroll-behavior:auto}
+  .orbit{animation:none!important}
 }
 
 @media print{
-  header,.subnav,.totop,.no-print{display:none!important}
+  header,.drawer,.drawer-mask,.totop,.no-print{display:none!important}
   body{background:#fff}
   .card,.feat,.kgrp,.qcard{box-shadow:none;border:1px solid #ddd}
 }
@@ -738,6 +791,9 @@ footer{
 <header>
   <div class="wrap">
     <div class="hd">
+      <button class="nav-btn" id="navBtn" aria-label="開啟目錄" title="目錄">
+        <span class="bars"></span>
+      </button>
       <div class="brand" onclick="go('home')">
         <div class="mk">Ch</div>
         <div>
@@ -763,24 +819,18 @@ footer{
   </div>
 </header>
 
-<!-- ══════════ 模式切換列：一鍵切到任何模式 ══════════ -->
-<nav class="subnav">
-  <div class="in" id="modeBar">
-    <span class="snlab">模式</span>
-    <button class="schip on" data-mode="home"><span class="ic">🏠</span>總覽</button>
-    <button class="schip" data-mode="cards"><span class="ic">📘</span>知識點</button>
-    <button class="schip" data-mode="quiz"><span class="ic">✏️</span>練習題</button>
-    <button class="schip" data-mode="ref"><span class="ic">📗</span>速查手冊</button>
-    <button class="schip" data-mode="flash"><span class="ic">🃏</span>記憶閃卡</button>
-    <button class="schip" data-mode="graph"><span class="ic">🕸</span>知識圖譜</button>
-    <button class="schip" data-mode="ptable"><span class="ic">🧪</span>週期表</button>
-    <button class="schip" data-mode="cpd"><span class="ic">🎨</span>化合物</button>
-    <button class="schip" data-mode="routes"><span class="ic">🔄</span>轉化圖</button>
-    <button class="schip" data-mode="eqs"><span class="ic">⚖️</span>方程式</button>
-    <button class="schip" data-mode="exam"><span class="ic">🎯</span>應試策略</button>
-    <button class="schip" data-mode="search"><span class="ic">🔍</span>全站搜尋</button>
+<!-- ══════════ 左側目錄抽屜 ══════════ -->
+<div class="drawer-mask" id="drawerMask"></div>
+<aside class="drawer" id="drawer" aria-label="功能目錄">
+  <div class="dw-head">
+    <div class="dw-title">功能目錄</div>
+    <button class="close-btn dw-close" id="drawerClose" aria-label="關閉目錄">✕</button>
   </div>
-</nav>
+  <div class="dw-list" id="drawerList"></div>
+  <div class="dw-foot">
+    進度與自測記錄只儲存在你的瀏覽器
+  </div>
+</aside>
 
 <!-- ══════════ 主體 ══════════ -->
 <div class="wrap">
@@ -947,12 +997,10 @@ footer{
         <h2>有機轉化圖</h2>
         <div class="d">官能團之間的互換路線：醇 → 酯、醇 → 醛 → 酸、酯 → 肥皂…</div>
       </div>
-      <div class="hint b">🔄 點擊圖中節點查看該官能團的完整反應清單；下方另有五條常考路線逐步拆解。</div>
+      <div class="hint b">🔄 <b>醇置於圖中央</b>作轉化樞紐；每個箭頭上標示該轉化所需的試劑與條件。點擊任一節點可查看該官能團的完整反應清單。</div>
       <div class="route-box"><div id="routeSvg"></div></div>
-      <div class="legend">
-        <span><i style="background:#9fb2c4"></i>正向轉化</span>
-        <span><i style="background:#d9a15c"></i>逆向／水解方向</span>
-      </div>
+      <div class="legend" id="routeLegend"></div>
+      <div class="card pad" id="routeSymbols" style="margin-top:14px"></div>
       <div id="routeDetail" style="margin-top:18px"></div>
       <div class="sect" style="margin-top:24px">
         <h2>常考路線逐步拆解</h2>
@@ -3114,61 +3162,179 @@ const COMPOUND_CATS = [
 <script>
 /* ============================================================
    有機轉化圖（官能團互換路線）
-   cat: alkane 烷 / alkene 烯 / halo 鹵代烷 / alcohol 醇
-        aldehyde 醛 / ketone 酮 / acid 羧酸 / ester 酯 / polymer 聚合物
+   佈局：醇（alcohol）置於正中，其餘官能團環繞
+   參考 DSE 有機化學轉化關係圖：黃色節點框 + 箭頭標示試劑／條件
+   cat: alkane 烷 / alkene 烯 / halo 鹵烷 / dihalo 二鹵烷 / alcohol 醇
+        aldehyde 醛 / ketone 酮 / acid 羧酸 / ester 酯 / amide 醯胺 / soap 羧酸鹽
+   kind: ox 氧化 / red 還原 / hyd 水解 / est 酯化·縮合 / sub 取代
+         elim 消去 / add 加成 / neu 中和
    ============================================================ */
 
 const ORG_NODES = [
-  { id: 'alkane',  label: '烷烴',      sub: 'CₙH₂ₙ₊₂',   x: 90,  y: 60,  cat: 'alkane',
-    example: 'CH₃CH₃（乙烷）', desc: '飽和烴，只有單鍵。化學性質較穩定。',
-    reactions: ['與 Cl₂／Br₂ 在紫外光下取代', '完全燃燒 → CO₂ + H₂O；不完全燃燒 → CO／C'] },
-  { id: 'alkene',  label: '烯烴',      sub: 'CₙH₂ₙ',     x: 320, y: 60,  cat: 'alkene',
-    example: 'CH₂=CH₂（乙烯）', desc: '含 C=C 雙鍵，不飽和，可發生加成反應。',
-    reactions: ['加 H₂（Ni 催化，150 °C）→ 烷烴', '加 Br₂ → 二溴代烷（溴水褪色）', '加 H₂O(g)（H₃PO₄ 催化）→ 醇', '加成聚合 → 聚合物'] },
-  { id: 'halo',    label: '鹵代烷',    sub: 'R–X',       x: 550, y: 60,  cat: 'halo',
+  { id: 'alkane',  label: '烷烴',   sub: 'CₙH₂ₙ₊₂',  x: 170, y: 200, cat: 'alkane',
+    example: 'CH₃CH₃（乙烷）', desc: '飽和烴，只有 C–C 單鍵，化學性質較穩定。',
+    reactions: ['與 Cl₂／Br₂ 在紫外光下取代 → 鹵烷 + HX', '完全燃燒 → CO₂ + H₂O；不完全燃燒 → CO／C', '催化裂解 → 烯烴 + 短鏈烷烴'] },
+
+  { id: 'alkene',  label: '烯烴',   sub: 'CₙH₂ₙ',    x: 170, y: 420, cat: 'alkene',
+    example: 'CH₂=CH₂（乙烯）', desc: '含 C=C 雙鍵，不飽和，主要發生加成反應。',
+    reactions: ['加 H₂（Ni／Pt 催化）→ 烷烴', '加 X₂ → 二鹵烷（溴水褪色）', '加 HX → 鹵烷', '加 H₂O(g)（H₃PO₄ 催化）→ 醇', '加成聚合 → 聚合物'] },
+
+  { id: 'dihalo',  label: '二鹵烷', sub: 'R–X₂',     x: 170, y: 660, cat: 'halo',
+    example: 'CH₂BrCH₂Br（1,2-二溴乙烷）', desc: '兩個鹵素原子分別接在相鄰碳上，由烯烴加鹵素生成。',
+    reactions: ['與 NaOH(aq) 加熱 → 二元醇', '可用於製備二醇、聚合物單體'] },
+
+  { id: 'halo',    label: '鹵烷',   sub: 'R–X',      x: 390, y: 300, cat: 'halo',
     example: 'CH₃CH₂Br（溴乙烷）', desc: '鹵素原子取代了氫的有機分子，是重要的合成中間體。',
-    reactions: ['與 NaOH(aq) 加熱回流 → 醇（取代／水解）', '與 NaOH 的乙醇溶液加熱 → 烯烴（消去）'] },
-  { id: 'alcohol', label: '醇',        sub: 'R–OH',      x: 780, y: 60,  cat: 'alcohol',
-    example: 'CH₃CH₂OH（乙醇）', desc: '含羥基 –OH。分為一級、二級、三級醇，氧化行為不同。',
-    reactions: ['與 Na 反應 → 放出 H₂', '與羧酸酯化 → 酯 + 水', '一級：氧化 → 醛 → 羧酸；二級：氧化 → 酮', '與濃 H₂SO₄ 加熱脫水 → 烯烴（消去）'] },
-  { id: 'aldehyde',label: '醛',        sub: 'R–CHO',     x: 780, y: 210, cat: 'aldehyde',
-    example: 'CH₃CHO（乙醛）', desc: '含 –CHO，由一級醇溫和氧化（蒸餾）取得。具還原性。',
-    reactions: ['氧化 → 羧酸（回流加熱）', 'Tollens 試劑 → 銀鏡；斐林試劑 → 磚紅沉澱'] },
-  { id: 'ketone',  label: '酮',        sub: 'R–CO–R′',   x: 1010,y: 210, cat: 'ketone',
-    example: 'CH₃COCH₃（丙酮）', desc: '由二級醇氧化生成，不易再被氧化。常用溶劑。',
-    reactions: ['不易被氧化（與醛的區別）', '不加成聚合，可用作溶劑'] },
-  { id: 'acid',    label: '羧酸',      sub: 'R–COOH',    x: 780, y: 360, cat: 'acid',
+    reactions: ['與 NaOH(aq) 回流加熱 → 醇（取代／水解）', '與 NaOH 的乙醇溶液加熱 → 烯烴（消去）', '與 NH₃ 的乙醇溶液（密封加熱）→ 胺'] },
+
+  { id: 'ketone',  label: '酮',     sub: 'R–CO–R′',  x: 390, y: 130, cat: 'ketone',
+    example: 'CH₃COCH₃（丙酮）', desc: '由二級醇氧化生成，不易再被氧化。常用作溶劑。',
+    reactions: ['不易被氧化（與醛的區別）', '不發生銀鏡反應、不與斐林試劑反應', '可作溶劑'] },
+
+  { id: 'alcohol', label: '醇',     sub: 'R–OH',     x: 640, y: 420, cat: 'alcohol',
+    center: true,
+    example: 'CH₃CH₂OH（乙醇）', desc: '含羥基 –OH。分為一級、二級、三級醇，氧化行為不同，是有機轉化的樞紐。',
+    reactions: ['與 Na 反應 → 放出 H₂', '與羧酸酯化 → 酯 + 水', '一級：氧化 → 醛 → 羧酸；二級：氧化 → 酮', '與濃 H₂SO₄ 加熱脫水 → 烯烴（消去）', '與 PCl₅／HX 反應 → 鹵烷'] },
+
+  { id: 'aldehyde',label: '醛',     sub: 'R–CHO',    x: 640, y: 170, cat: 'aldehyde',
+    example: 'CH₃CHO（乙醛）', desc: '含 –CHO，由一級醇溫和氧化（蒸餾）取得，具還原性。',
+    reactions: ['氧化 → 羧酸（回流加熱）', 'Tollens 試劑 → 銀鏡；斐林試劑 → 磚紅沉澱', '還原 → 一級醇（LiAlH₄／NaBH₄）'] },
+
+  { id: 'acid',    label: '羧酸',   sub: 'R–COOH',   x: 920, y: 300, cat: 'acid',
     example: 'CH₃COOH（乙酸）', desc: '含羧基，弱酸性，可發生典型酸反應。',
-    reactions: ['與金屬／碳酸鹽反應', '與醇酯化（濃 H₂SO₄、加熱）→ 酯', '與鹼中和 → 羧酸鹽'] },
-  { id: 'ester',   label: '酯',        sub: 'R–COO–R′',  x: 780, y: 510, cat: 'ester',
+    reactions: ['與金屬／碳酸鹽反應 → 放出 H₂／CO₂', '與醇酯化（濃 H₂SO₄、加熱）→ 酯', '與鹼中和 → 羧酸鹽', '與 NH₃ 加熱 → 醯胺'] },
+
+  { id: 'ester',   label: '酯',     sub: 'R–COO–R′', x: 920, y: 570, cat: 'ester',
     example: 'CH₃COOCH₂CH₃（乙酸乙酯）', desc: '有果香味，難溶於水，常用作溶劑與香料。',
-    reactions: ['酸性水解 → 羧酸 + 醇（可逆）', '鹼性水解（皂化）→ 羧酸鹽 + 醇（不可逆）'] },
-  { id: 'polymer', label: '聚合物',    sub: '加成／縮合',  x: 320, y: 210, cat: 'polymer',
-    example: '聚乙烯、PVC、尼龍、聚酯', desc: '由大量單體連接而成的高分子量物質。',
-    reactions: ['加成聚合：烯烴開雙鍵連接（無副產物）', '縮合聚合：二官能團單體脫去 H₂O／HCl'] },
-  { id: 'soap',    label: '羧酸鹽（肥皂）', sub: 'R–COO⁻Na⁺', x: 1010, y: 510, cat: 'ester',
+    reactions: ['酸性水解 → 羧酸 + 醇（可逆）', '鹼性水解（皂化）→ 羧酸鹽 + 醇（不可逆）', '與 NH₃ 反應 → 醯胺 + 醇'] },
+
+  { id: 'amide',   label: '醯胺',   sub: 'R–CONH₂',  x: 1130, y: 430, cat: 'amide',
+    example: 'CH₃CONH₂（乙醯胺）', desc: '含 –CONH₂。可由羧酸／酯與 NH₃ 反應生成，是尼龍等聚醯胺的結構單元。',
+    reactions: ['羧酸 + NH₃ → 銨鹽，再加熱脫水 → 醯胺', '酯 + NH₃ → 醯胺 + 醇', '水解 → 羧酸（或羧酸鹽）+ NH₃'] },
+
+  { id: 'soap',    label: '羧酸鹽（肥皂）', sub: 'R–COO⁻Na⁺', x: 640, y: 700, cat: 'soap',
     example: 'C₁₇H₃₅COONa（硬脂酸鈉）', desc: '酯鹼性水解（皂化）的產物，具清潔作用。',
-    reactions: ['親油尾插入油污、親水頭向外 → 乳化', '硬水中生成不溶浮渣（scum）'] }
+    reactions: ['親油尾插入油污、親水頭向外 → 乳化', '硬水中生成不溶浮渣（scum）', '與稀酸反應 → 析出羧酸'] }
 ];
 
+/* bend：垂直於連線的彎曲量（px），正負代表彎向不同側，用來分開雙向箭頭 */
 const ORG_LINKS = [
-  { from: 'alkane',  to: 'halo',    label: 'Cl₂ / UV', note: '取代反應：紫外光下逐步取代 H', cond: '紫外光 (UV)', type: 'forward' },
-  { from: 'alkane',  to: 'alkene',  label: '裂解',     note: '催化裂解：大分子斷裂生成烯烴 + 短鏈烷烴', cond: '約 500 °C、沸石催化劑', type: 'forward' },
-  { from: 'alkene',  to: 'halo',    label: 'HX 加成',  note: '與鹵化氫加成生成鹵代烷', cond: '常溫', type: 'forward' },
-  { from: 'alkene',  to: 'alcohol', label: '加水',     note: '與水蒸汽加成（工業製醇）', cond: 'H₃PO₄ 催化、高溫高壓', type: 'forward' },
-  { from: 'alkene',  to: 'polymer', label: '加成聚合', note: '單體雙鍵打開互相連接', cond: '催化劑、高壓', type: 'forward' },
-  { from: 'halo',    to: 'alcohol', label: 'NaOH(aq)', note: '取代（水解）：X 被 –OH 取代', cond: 'NaOH(aq)、回流加熱', type: 'forward' },
-  { from: 'alcohol', to: 'halo',    label: 'HX／PCl₅', note: '羥基被鹵素取代', cond: '鹵化劑', type: 'back' },
-  { from: 'alcohol', to: 'alkene',  label: '脫水',     note: '消去反應：脫去 –OH 與相鄰 H 生成雙鍵', cond: '濃 H₂SO₄ 或 Al₂O₃、加熱', type: 'back' },
-  { from: 'alcohol', to: 'aldehyde',label: '[O] 蒸餾', note: '一級醇氧化成醛（立即餾出避免繼續氧化）', cond: '酸性 K₂Cr₂O₇、蒸餾', type: 'forward' },
-  { from: 'alcohol', to: 'ketone',  label: '[O]',      note: '二級醇氧化成酮（不再被氧化）', cond: '酸性 K₂Cr₂O₇、回流', type: 'forward' },
-  { from: 'alcohol', to: 'ester',   label: '酯化',     note: '醇 + 羧酸 → 酯 + 水（最重要的一條路線）', cond: '濃 H₂SO₄ 催化、加熱、可逆', type: 'forward' },
-  { from: 'aldehyde',to: 'acid',    label: '[O] 回流', note: '醛進一步氧化成羧酸', cond: '酸性 K₂Cr₂O₇、回流加熱', type: 'forward' },
-  { from: 'acid',    to: 'ester',   label: '酯化',     note: '羧酸 + 醇 → 酯 + 水', cond: '濃 H₂SO₄ 催化、加熱、可逆', type: 'forward' },
-  { from: 'ester',   to: 'acid',    label: '酸性水解', note: '酯與稀酸共熱，可逆地生成羧酸 + 醇', cond: '稀 H₂SO₄、回流、可逆', type: 'back' },
-  { from: 'ester',   to: 'soap',    label: '皂化',     note: '酯的鹼性水解，生成羧酸鹽 + 醇，不可逆', cond: 'NaOH(aq)、回流加熱、不可逆', type: 'forward' },
-  { from: 'acid',    to: 'soap',    label: '中和',     note: '羧酸與 NaOH 中和生成羧酸鹽', cond: 'NaOH(aq)', type: 'forward' },
-  { from: 'polymer', to: 'ester',   label: '聚酯',     note: '二羧酸 + 二醇縮合形成酯鍵（PET）', cond: '縮合聚合、脫水', type: 'forward' }
+  { from: 'alkane',  to: 'halo',    kind: 'sub',  bend: 0,
+    label: '取代', reagents: ['X₂（Cl₂／Br₂）', '紫外光 UV'],
+    note: '取代反應：紫外光下鹵素逐步取代 H', cond: '紫外光（UV）照射' },
+
+  { from: 'alkane',  to: 'alkene',  kind: 'elim', bend: -60,
+    label: '裂解', reagents: ['催化裂解'],
+    note: '大分子烷烴斷裂生成較小烯烴 + 短鏈烷烴', cond: '約 500 °C、沸石催化劑' },
+
+  { from: 'alkene',  to: 'alkane',  kind: 'add',  bend: 60,
+    label: '加氫', reagents: ['H₂ / Ni 或 Pt', '150 °C'],
+    note: '加成反應：雙鍵打開加上兩個 H', cond: 'Ni／Pt 催化、加熱' },
+
+  { from: 'alkene',  to: 'dihalo',  kind: 'add',  bend: 0,
+    label: '加鹵素', reagents: ['X₂（Br₂ 水）', '溴水褪色'],
+    note: '加成反應：兩個鹵素分別加到雙鍵兩端', cond: '常溫（溴水由橙棕變無色）' },
+
+  { from: 'alkene',  to: 'halo',    kind: 'add',  bend: 0,
+    label: '加 HX', reagents: ['HX（HCl／HBr）'],
+    note: '加成反應：鹵化氫加到雙鍵上生成鹵烷', cond: '常溫' },
+
+  { from: 'alkene',  to: 'alcohol', kind: 'add',  bend: -70,
+    label: '加水', reagents: ['H₂O(g)', 'H₃PO₄ 催化、高溫高壓'],
+    note: '工業製醇：乙烯與水蒸汽加成生成乙醇', cond: 'H₃PO₄ 催化、約 300 °C、高壓' },
+
+  { from: 'alcohol', to: 'alkene',  kind: 'elim', bend: 70,
+    label: '脫水', reagents: ['濃 H₂SO₄，Δ', '或 Al₂O₃ 加熱'],
+    note: '消去反應：脫去 –OH 與相鄰碳上的 H 生成 C=C', cond: '濃 H₂SO₄ 加熱（約 170 °C）或 Al₂O₃ 熱管' },
+
+  { from: 'halo',    to: 'alcohol', kind: 'hyd',  bend: -35,
+    label: '水解', reagents: ['NaOH(aq)', '回流加熱'],
+    note: '取代（水解）：–X 被 –OH 取代生成醇', cond: 'NaOH(aq)、回流加熱' },
+
+  { from: 'alcohol', to: 'halo',    kind: 'sub',  bend: 95,
+    label: '鹵化', reagents: ['PCl₅ / PCl₃', '或 HX（ZnCl₂）'],
+    note: '取代反應：–OH 被鹵素取代生成鹵烷', cond: '鹵化劑（PCl₅ 常溫，產生白煙 HCl）' },
+
+  { from: 'alcohol', to: 'aldehyde',kind: 'ox',   bend: 0,
+    label: '氧化（1°醇）', reagents: ['[O] 蒸餾', 'K₂Cr₂O₇ / H⁺'],
+    note: '一級醇氧化成醛，須立即蒸餾餾出以免繼續氧化成酸', cond: '酸性 K₂Cr₂O₇，蒸餾（橙 → 綠）' },
+
+  { from: 'alcohol', to: 'ketone',  kind: 'ox',   bend: -45,
+    label: '氧化（2°醇）', reagents: ['[O] 回流', 'K₂Cr₂O₇ / H⁺'],
+    note: '二級醇氧化成酮，酮不再被氧化', cond: '酸性 K₂Cr₂O₇，回流加熱' },
+
+  { from: 'aldehyde',to: 'acid',    kind: 'ox',   bend: 0,
+    label: '氧化', reagents: ['[O] 回流', 'K₂Cr₂O₇ / H⁺'],
+    note: '醛進一步氧化成羧酸', cond: '酸性 K₂Cr₂O₇，回流加熱（橙 → 綠）' },
+
+  { from: 'aldehyde',to: 'alcohol', kind: 'red',  bend: 55,
+    label: '還原', reagents: ['LiAlH₄ / NaBH₄', '[H]'],
+    note: '醛還原回一級醇', cond: 'LiAlH₄（乾醚）或 NaBH₄' },
+
+  { from: 'alcohol', to: 'ester',   kind: 'est',  bend: 0,
+    label: '酯化', reagents: ['+ 羧酸', '濃 H₂SO₄，Δ（可逆 ⇌）'],
+    note: '醇 + 羧酸 → 酯 + 水（最重要的一條路線）', cond: '濃 H₂SO₄ 催化、加熱、可逆' },
+
+  { from: 'acid',    to: 'ester',   kind: 'est',  bend: 60,  lt: 0.22,
+    label: '酯化', reagents: ['+ 醇', '濃 H₂SO₄，Δ（可逆 ⇌）'],
+    note: '羧酸 + 醇 → 酯 + 水', cond: '濃 H₂SO₄ 催化、加熱、可逆' },
+
+  { from: 'ester',   to: 'acid',    kind: 'hyd',  bend: -95, lt: 0.5,
+    label: '水解', reagents: ['1. H⁺／加酸水解（可逆 ⇌）', '2. OH⁻／加鹼水解（不可逆 →）'],
+    note: '酸性水解生成羧酸 + 醇（可逆）；鹼性水解生成羧酸鹽 + 醇（不可逆）',
+    cond: '稀 H₂SO₄ 回流（可逆）／ NaOH(aq) 回流（不可逆）' },
+
+  { from: 'ester',   to: 'soap',    kind: 'hyd',  bend: 0,
+    label: '皂化', reagents: ['NaOH(aq)，Δ', '不可逆 →'],
+    note: '酯的鹼性水解，生成羧酸鹽（肥皂）+ 醇', cond: 'NaOH(aq)、回流加熱、不可逆' },
+
+  { from: 'ester',   to: 'amide',   kind: 'est',  bend: 0,
+    label: '氨解', reagents: ['NH₃（乙醇溶液）'],
+    note: '酯 + 氨 → 醯胺 + 醇', cond: 'NH₃ 的乙醇溶液、加熱' },
+
+  { from: 'acid',    to: 'amide',   kind: 'est',  bend: 0,
+    label: '醯胺化', reagents: ['NH₃ → 銨鹽', '再加熱脫水 Δ'],
+    note: '羧酸先與氨生成羧酸銨，再加熱脫水生成醯胺', cond: '加入 NH₃ 生成銨鹽後強熱脫水' },
+
+  { from: 'acid',    to: 'soap',    kind: 'neu',  bend: -60, lt: 0.28,
+    label: '中和', reagents: ['NaOH(aq)'],
+    note: '羧酸與鹼中和生成羧酸鹽與水', cond: 'NaOH(aq)、常溫' },
+
+  { from: 'amide',   to: 'acid',    kind: 'hyd',  bend: 60,
+    label: '水解', reagents: ['H⁺ 或 OH⁻，Δ'],
+    note: '醯胺水解生成羧酸（酸性）或羧酸鹽（鹼性）', cond: '稀酸或稀鹼、回流加熱' },
+
+  { from: 'dihalo',  to: 'alcohol', kind: 'hyd',  bend: -80,
+    label: '水解', reagents: ['NaOH(aq)，Δ'],
+    note: '二鹵烷水解生成二元醇', cond: 'NaOH(aq)、回流加熱' }
+];
+
+/* 箭頭顏色（依反應類型） */
+const EDGE_COLOR = {
+  ox:   '#dc2626',  // 氧化
+  red:  '#2563eb',  // 還原
+  hyd:  '#059669',  // 水解
+  est:  '#7c3aed',  // 酯化／縮合
+  sub:  '#0d9488',  // 取代
+  elim: '#d97706',  // 消去
+  add:  '#0284c7',  // 加成
+  neu:  '#64748b'   // 中和
+};
+const EDGE_KIND_LABEL = {
+  ox: '氧化', red: '還原', hyd: '水解', est: '酯化／縮合',
+  sub: '取代', elim: '消去', add: '加成', neu: '中和'
+};
+
+/* 符號說明 */
+const ROUTE_SYMBOLS = [
+  ['[O]', '氧化劑（如酸性 K₂Cr₂O₇、KMnO₄）'],
+  ['[H]', '還原劑（如 LiAlH₄、NaBH₄）'],
+  ['Δ', '加熱'],
+  ['X', '鹵素原子（Cl／Br／I）'],
+  ['R、R′', '烷基（烴基）'],
+  ['⇌', '可逆反應'],
+  ['→', '不可逆反應（進行到底）'],
+  ['回流', '加熱時蒸氣冷凝回流，避免反應物逸失']
 ];
 
 /* 重點反應路線（逐步示範） */
@@ -3209,53 +3375,52 @@ const ORG_ROUTES = [
     ]
   },
   {
-    title: '乙烯 → 乙醇 → 乙酸乙酯（工業合成路線）',
-    en: 'Ethene → Ethanol → Ethyl ethanoate',
+    title: '乙醇 → 乙烯 → 乙醇（脫水與水合）',
+    en: 'Alcohol → Alkene → Alcohol',
     steps: [
-      { node: 'alkene', text: '乙烯（來自石油裂解）' },
-      { node: 'alcohol', text: '乙醇（加水蒸汽加成）' },
-      { node: 'ester', text: '乙酸乙酯（與乙酸酯化）' }
+      { node: 'alcohol', text: '乙醇' },
+      { node: 'alkene', text: '乙烯（濃 H₂SO₄ 加熱脫水）' },
+      { node: 'alcohol', text: '乙醇（工業上：乙烯 + 水蒸汽加成）' }
     ],
-    eq: 'CH₂=CH₂ + H₂O(g) → CH₃CH₂OH（H₃PO₄ 催化）',
-    cond: '第一步：H₃PO₄ 催化、高溫高壓；或發酵法（葡萄糖 → 乙醇）',
-    observe: '第一步無明顯可觀察變化；酯化步驟出現果香味產物',
+    eq: 'CH₃CH₂OH → CH₂=CH₂ + H₂O　｜　CH₂=CH₂ + H₂O → CH₃CH₂OH',
+    cond: '脫水：濃 H₂SO₄ 約 170 °C 或 Al₂O₃ 熱管；水合：H₃PO₄ 催化、高溫高壓',
+    observe: '乙烯能使溴水由橙棕變無色（檢驗 C=C）',
     tips: [
-      '工業製乙醇有兩條路線：乙烯加水（加成）與葡萄糖發酵。',
-      '發酵法須在 30–40 °C、無氧、酵母催化下進行，溫度過高酶會變性。',
-      '這條路線常出現在「由石油出發合成某有機物」的推斷題。'
+      '脫水是消去反應，要寫「濃 H₂SO₄」或「Al₂O₃」+「加熱」。',
+      '工業製醇（乙烯水合）與實驗室製醇（發酵）要分清楚。',
+      '檢驗烯烴用溴水褪色，比用 KMnO₄ 更常見。'
     ]
   },
   {
-    title: '酯 → 肥皂（皂化路線）',
-    en: 'Ester → Soap (Saponification)',
+    title: '酯 → 羧酸鹽（皂化）',
+    en: 'Ester → Carboxylate (Saponification)',
     steps: [
-      { node: 'ester', text: '油脂（三酸甘油酯，含三個酯基）' },
-      { node: 'soap', text: '長鏈羧酸鈉（肥皂）+ 甘油' }
+      { node: 'ester', text: '乙酸乙酯（或油脂）' },
+      { node: 'soap', text: '羧酸鈉 + 乙醇' }
     ],
-    eq: '油脂 + 3NaOH → 3 R–COONa（肥皂）+ 甘油（丙三醇）',
-    cond: 'NaOH(aq)、回流加熱、反應不可逆（用 →）',
-    observe: '混合物由油水分層變成不分層；加食鹽可「鹽析」使肥皂析出',
+    eq: 'CH₃COOCH₂CH₃ + NaOH → CH₃COONa + CH₃CH₂OH',
+    cond: 'NaOH(aq)、回流加熱、不可逆（用 →）',
+    observe: '果香味逐漸消失；油脂與 NaOH 共熱後得到黏稠皂液',
     tips: [
-      '皂化不可逆，與酸性水解（可逆）必須分清楚。',
-      '肥皂在硬水中與 Ca²⁺／Mg²⁺ 生成不溶浮渣，減弱清潔力；合成清潔劑則不會。',
-      '甘油（丙三醇）是副產物，常用於護膚品與食品。'
+      '皂化不可逆，一定要用 →，不能寫 ⇌。',
+      '產物是「羧酸鹽 + 醇」，不是「羧酸 + 醇」——鹼性環境下酸會立刻成鹽。',
+      '若題目要得到羧酸，需在皂化後再加稀酸酸化。'
     ]
   },
   {
-    title: '烷烴 → 鹵代烷 → 醇（取代路線）',
-    en: 'Alkane → Haloalkane → Alcohol',
+    title: '乙酸乙酯的酸性 vs 鹼性水解',
+    en: 'Acidic vs alkaline hydrolysis of an ester',
     steps: [
-      { node: 'alkane', text: '乙烷（飽和烴）' },
-      { node: 'halo', text: '溴乙烷（UV 光下取代）' },
-      { node: 'alcohol', text: '乙醇（NaOH(aq) 水解）' }
+      { node: 'ester', text: '乙酸乙酯' },
+      { node: 'acid', text: '乙酸 + 乙醇（酸性水解，可逆）' },
+      { node: 'soap', text: '乙酸鈉 + 乙醇（鹼性水解，不可逆）' }
     ],
-    eq: 'CH₃CH₃ + Br₂ →(UV) CH₃CH₂Br + HBr　｜　CH₃CH₂Br + NaOH(aq) → CH₃CH₂OH + NaBr',
-    cond: '第一步：紫外光（UV）；第二步：NaOH(aq)、回流加熱',
-    observe: '溴的紅棕色漸漸褪去（第一步）；第二步無明顯顏色變化',
+    eq: '酸性：CH₃COOCH₂CH₃ + H₂O ⇌ CH₃COOH + CH₃CH₂OH\n鹼性：CH₃COOCH₂CH₃ + NaOH → CH₃COONa + CH₃CH₂OH',
+    cond: '酸性：稀 H₂SO₄ 回流（可逆）；鹼性：NaOH(aq) 回流（不可逆）',
+    observe: '兩者皆使果香味消失；鹼性水解反應較完全',
     tips: [
-      '烷烴取代一定要寫 UV 光；鹵代烷水解要用 NaOH(aq) 並回流。',
-      '若改用 NaOH 的乙醇溶液並加熱，發生的是消去反應，生成烯烴而非醇 —— 條件決定產物。',
-      '這是「烷烴如何變成其他官能團」的唯一入門路線，推斷題常見。'
+      '這是卷一的高頻對比題：酸性可逆、鹼性不可逆。',
+      '酸性水解得「羧酸」，鹼性水解得「羧酸鹽」，產物不同要寫對。'
     ]
   }
 ];
@@ -3504,18 +3669,67 @@ function letter(i) { return String.fromCharCode(65 + i); }
 function topicName(id) { const t = TOPIC_MAP[id]; return t ? (t.code + ' ' + t.zh) : id; }
 function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
+/* ── 模式定義（左側目錄來源）────────────────────────────── */
+const MODES = [
+  { id: 'home',    ic: '🏠', t: '總覽',      s: '進度總覽與功能導覽' },
+  { id: 'cards',   ic: '📘', t: '知識點',    s: '15 課題 · 可勾選掌握' },
+  { id: 'quiz',    ic: '✏️', t: '練習題',    s: '刷卷模式 · 精確模式' },
+  { id: 'ref',     ic: '📗', t: '速查手冊',  s: '檢驗 · 常數 · 指示劑' },
+  { id: 'flash',   ic: '🃏', t: '記憶閃卡',  s: '翻卡自評 · 只溫弱項' },
+  { id: 'graph',   ic: '🕸', t: '知識圖譜',  s: '課題關聯 · 點擊跳轉' },
+  { id: 'ptable',  ic: '🧪', t: '週期表',    s: '118 元素 · 原子模型' },
+  { id: 'cpd',     ic: '🎨', t: '化合物',    s: '顏色 · 用途 · 檢驗' },
+  { id: 'routes',  ic: '🔄', t: '轉化圖',    s: '醇為中心 · 標示試劑' },
+  { id: 'eqs',     ic: '⚖️', t: '方程式',    s: '常見反應 · 可搜尋' },
+  { id: 'exam',    ic: '🎯', t: '應試策略',  s: '架構 · 計算 · 失分位' },
+  { id: 'search',  ic: '🔍', t: '全站搜尋',  s: '一次搜遍所有內容' }
+];
+
+/* ── 左側目錄抽屜 ────────────────────────────────────────── */
+function renderDrawer() {
+  const box = $('drawerList');
+  if (!box) return;
+  box.innerHTML = '';
+  MODES.forEach(function (m) {
+    const b = el('button', 'dw-item' + (state.mode === m.id ? ' on' : ''));
+    b.appendChild(el('span', 'ic', m.ic));
+    const tx = el('div', 'tx');
+    tx.appendChild(document.createTextNode(m.t));
+    tx.appendChild(el('small', null, m.s));
+    b.appendChild(tx);
+    b.onclick = function () { go(m.id); closeDrawer(); };
+    box.appendChild(b);
+  });
+}
+function openDrawer() {
+  const d = $('drawer'), mk = $('drawerMask'), nb = $('navBtn');
+  if (d) d.classList.add('on');
+  if (mk) mk.classList.add('on');
+  if (nb) nb.classList.add('on');
+  document.body.classList.add('dw-open');
+  renderDrawer();
+}
+function closeDrawer() {
+  const d = $('drawer'), mk = $('drawerMask'), nb = $('navBtn');
+  if (d) d.classList.remove('on');
+  if (mk) mk.classList.remove('on');
+  if (nb) nb.classList.remove('on');
+  document.body.classList.remove('dw-open');
+}
+function toggleDrawer() {
+  const d = $('drawer');
+  if (d && d.classList.contains('on')) closeDrawer(); else openDrawer();
+}
+
 /* ── 模式切換 ────────────────────────────────────────────── */
 function go(m) {
   state.mode = m;
-  document.querySelectorAll('#modeBar .schip').forEach(function (b) {
-    b.classList.toggle('on', b.dataset.mode === m);
-  });
   document.querySelectorAll('.pane').forEach(function (p) {
     p.classList.toggle('on', p.id === 'pane-' + m);
   });
-  // 把目前模式 chip 捲到可見位置
-  const act = document.querySelector('#modeBar .schip.on');
-  if (act && act.scrollIntoView) act.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+  document.querySelectorAll('#drawerList .dw-item').forEach(function (b, i) {
+    b.classList.toggle('on', MODES[i] && MODES[i].id === m);
+  });
   window.scrollTo({ top: 0, behavior: 'smooth' });
   if (m === 'home') renderHome();
   if (m === 'flash') { buildFcQueue(); renderFlash(); }
@@ -4557,48 +4771,81 @@ function atomSVG(e) {
   const svg = document.createElementNS(NS, 'svg');
   svg.setAttribute('class', 'atom-svg');
   svg.setAttribute('viewBox', '0 0 300 300');
-  const shells = e.shells, maxR = 132, base = 34;
+
+  const shells = e.shells, maxR = 128, base = 40;
   const step = shells.length > 1 ? (maxR - base) / (shells.length - 1) : 0;
+
+  /* 漸層定義（原子核） */
+  const defs = document.createElementNS(NS, 'defs');
+  const gd = document.createElementNS(NS, 'radialGradient');
+  gd.setAttribute('id', 'nucG');
+  const s1 = document.createElementNS(NS, 'stop');
+  s1.setAttribute('offset', '0%'); s1.setAttribute('stop-color', '#5eead4');
+  const s2 = document.createElementNS(NS, 'stop');
+  s2.setAttribute('offset', '100%'); s2.setAttribute('stop-color', '#0d9488');
+  gd.appendChild(s1); gd.appendChild(s2);
+  defs.appendChild(gd);
+  /* 電子發光 */
+  const eg = document.createElementNS(NS, 'radialGradient');
+  eg.setAttribute('id', 'elecG');
+  const e1 = document.createElementNS(NS, 'stop');
+  e1.setAttribute('offset', '0%'); e1.setAttribute('stop-color', '#93c5fd');
+  const e2 = document.createElementNS(NS, 'stop');
+  e2.setAttribute('offset', '100%'); e2.setAttribute('stop-color', '#2563eb');
+  eg.appendChild(e1); eg.appendChild(e2);
+  defs.appendChild(eg);
+  svg.appendChild(defs);
+
+  /* 原子核光暈 */
+  const halo = document.createElementNS(NS, 'circle');
+  halo.setAttribute('cx', 150); halo.setAttribute('cy', 150); halo.setAttribute('r', 40);
+  halo.setAttribute('fill', 'rgba(13,148,136,.10)');
+  svg.appendChild(halo);
+
+  /* 軌道（靜態，不旋轉） */
   shells.forEach(function (_, i) {
     const r = base + step * i;
     const c = document.createElementNS(NS, 'circle');
     c.setAttribute('cx', 150); c.setAttribute('cy', 150); c.setAttribute('r', r);
     c.setAttribute('fill', 'none');
-    c.setAttribute('stroke', '#c3d1de'); c.setAttribute('stroke-width', '1.4');
+    c.setAttribute('stroke', '#dbe3ec'); c.setAttribute('stroke-width', '1.3');
     svg.appendChild(c);
   });
+
+  /* 電子層：每層一個 <g>，繞核旋轉（內快外慢、方向交替） */
+  shells.forEach(function (cnt, i) {
+    const r = base + step * i;
+    const g = document.createElementNS(NS, 'g');
+    g.setAttribute('class', 'orbit');
+    /* 週期：內層 5s，逐層 +2.6s；偶數層順時針、奇數層逆時針 */
+    const dur = (5 + i * 2.6).toFixed(1);
+    const dir = i % 2 === 0 ? 'normal' : 'reverse';
+    g.style.animation = 'orbit ' + dur + 's linear infinite ' + dir;
+    g.setAttribute('data-dur', dur + 's');
+    for (let k = 0; k < cnt; k++) {
+      const ang = (2 * Math.PI * k) / cnt - Math.PI / 2;
+      const d = document.createElementNS(NS, 'circle');
+      d.setAttribute('cx', 150 + r * Math.cos(ang));
+      d.setAttribute('cy', 150 + r * Math.sin(ang));
+      d.setAttribute('r', 5);
+      d.setAttribute('fill', 'url(#elecG)');
+      g.appendChild(d);
+    }
+    svg.appendChild(g);
+  });
+
+  /* 原子核 */
   const nuc = document.createElementNS(NS, 'circle');
-  nuc.setAttribute('cx', 150); nuc.setAttribute('cy', 150); nuc.setAttribute('r', 26);
-  nuc.setAttribute('fill', 'url(#ng)');
+  nuc.setAttribute('cx', 150); nuc.setAttribute('cy', 150); nuc.setAttribute('r', 30);
+  nuc.setAttribute('fill', 'url(#nucG)');
   svg.appendChild(nuc);
-  const defs = document.createElementNS(NS, 'defs');
-  const gd = document.createElementNS(NS, 'radialGradient');
-  gd.setAttribute('id', 'ng');
-  const s1 = document.createElementNS(NS, 'stop');
-  s1.setAttribute('offset', '0%'); s1.setAttribute('stop-color', '#5eead4');
-  const s2 = document.createElementNS(NS, 'stop');
-  s2.setAttribute('offset', '100%'); s2.setAttribute('stop-color', '#0d9488');
-  gd.appendChild(s1); gd.appendChild(s2); defs.appendChild(gd);
-  svg.insertBefore(defs, svg.firstChild);
   const nl = document.createElementNS(NS, 'text');
   nl.setAttribute('x', 150); nl.setAttribute('y', 150);
   nl.setAttribute('text-anchor', 'middle'); nl.setAttribute('dominant-baseline', 'central');
   nl.setAttribute('fill', '#fff');
-  nl.setAttribute('style', 'font:800 14px "PingFang HK","Noto Sans TC",sans-serif');
+  nl.setAttribute('style', 'font:800 15px "PingFang HK","Noto Sans TC",sans-serif');
   nl.textContent = e.z + 'p';
   svg.appendChild(nl);
-  shells.forEach(function (cnt, i) {
-    const r = base + step * i;
-    for (let k = 0; k < cnt; k++) {
-      const ang = (2 * Math.PI * k) / cnt - Math.PI / 2;
-      const g = document.createElementNS(NS, 'circle');
-      g.setAttribute('cx', 150 + r * Math.cos(ang));
-      g.setAttribute('cy', 150 + r * Math.sin(ang));
-      g.setAttribute('r', 4.6);
-      g.setAttribute('fill', '#2563eb');
-      svg.appendChild(g);
-    }
-  });
   return svg;
 }
 function openElementModal(e) {
@@ -4623,14 +4870,17 @@ function openElementModal(e) {
   pills.appendChild(el('span', 'pill blue', e.shells.join(', ')));
   ht.appendChild(pills);
   head.appendChild(ht);
-  const close = el('button', 'close-btn', '✕');
+  const close = el('button', 'close-btn modal-close', '✕');
   close.onclick = closeModal;
   head.appendChild(close);
   box.appendChild(head);
 
   const atom = el('div', 'atom-box');
-  atom.appendChild(atomSVG(e));
-  atom.appendChild(el('div', 'atom-cap', '原子模型示意圖　·　電子層排布：' + e.shells.join('、')));
+  const asvg = atomSVG(e);
+  atom.appendChild(asvg);
+  atom.appendChild(el('div', 'atom-cap',
+    '電子繞核運轉示意圖　·　電子層排布：' + e.shells.join('、') + '　（點擊圖可暫停／繼續）'));
+  atom.onclick = function () { asvg.classList.toggle('paused'); };
   box.appendChild(atom);
 
   const info = el('div', 'info-grid');
@@ -4737,32 +4987,103 @@ function renderCompounds(filter) {
 }
 
 /* ══════════ 有機轉化圖 ══════════ */
-const ROUTE_CURVE = {
-  'alkane>halo': -90, 'alkane>alkene': 'none',
-  'alkene>halo': 'none', 'alkene>alcohol': -95, 'alkene>polymer': 'none',
-  'halo>alcohol': 'none', 'alcohol>halo': 95, 'alcohol>alkene': 175,
-  'alcohol>aldehyde': 'none', 'alcohol>ketone': 'none', 'alcohol>ester': -215,
-  'aldehyde>acid': 'none', 'acid>ester': 'none', 'ester>acid': 215,
-  'ester>soap': 'none', 'acid>soap': 'none', 'polymer>ester': 235
-};
+/* ── 轉化圖幾何工具 ─────────────────────────────────────── */
+function bezPt(p0, c, p1, t) {
+  const u = 1 - t;
+  return {
+    x: u * u * p0.x + 2 * u * t * c.x + t * t * p1.x,
+    y: u * u * p0.y + 2 * u * t * c.y + t * t * p1.y
+  };
+}
+function bezTan(p0, c, p1, t) {
+  const u = 1 - t;
+  const x = 2 * u * (c.x - p0.x) + 2 * t * (p1.x - c.x);
+  const y = 2 * u * (c.y - p0.y) + 2 * t * (p1.y - c.y);
+  const l = Math.sqrt(x * x + y * y) || 1;
+  return { x: x / l, y: y / l };
+}
+/* 二次貝茲在 t 處切分，回傳左右兩段 */
+function bezSplit(p0, c, p1, t) {
+  const l1 = { x: p0.x + (c.x - p0.x) * t, y: p0.y + (c.y - p0.y) * t };
+  const mid = bezPt(p0, c, p1, t);
+  const r1 = { x: c.x + (p1.x - c.x) * t, y: c.y + (p1.y - c.y) * t };
+  return { left: [p0, l1, mid], right: [mid, r1, p1] };
+}
+/* 由中心沿方向 (ux,uy) 到矩形邊界的距離 */
+function boxExit(hw, hh, ux, uy) {
+  const ax = Math.abs(ux), ay = Math.abs(uy);
+  if (ax < 1e-6) return hh / ay;
+  if (ay < 1e-6) return hw / ax;
+  return Math.min(hw / ax, hh / ay);
+}
+/* 建立連線：bend 為垂直方向的彎曲量；回傳裁掉節點框後的子曲線 */
+function linkGeom(a, b, bend) {
+  const dx = b.x - a.x, dy = b.y - a.y;
+  const len = Math.sqrt(dx * dx + dy * dy) || 1;
+  const px = -dy / len, py = dx / len;
+  const p0 = { x: a.x, y: a.y }, p1 = { x: b.x, y: b.y };
+  const c = { x: (a.x + b.x) / 2 + px * bend * 2, y: (a.y + b.y) / 2 + py * bend * 2 };
+
+  const aw = (a.center ? 176 : 152) / 2, ah = (a.center ? 64 : 54) / 2;
+  const bw = (b.center ? 176 : 152) / 2, bh = (b.center ? 64 : 54) / 2;
+  const t0 = bezTan(p0, c, p1, 0), t1 = bezTan(p0, c, p1, 1);
+  const pad0 = boxExit(aw, ah, t0.x, t0.y) + 4;
+  const pad1 = boxExit(bw, bh, -t1.x, -t1.y) + 12;
+
+  /* 二分找出裁切參數 */
+  let lo = 0, hi = 0.5, s0 = 0.06;
+  for (let i = 0; i < 22; i++) {
+    const m = (lo + hi) / 2;
+    const q = bezPt(p0, c, p1, m);
+    const d = Math.hypot(q.x - p0.x, q.y - p0.y);
+    if (d < pad0) lo = m; else hi = m;
+  }
+  s0 = (lo + hi) / 2;
+  lo = 0.5; hi = 1;
+  let s1 = 0.94;
+  for (let i = 0; i < 22; i++) {
+    const m = (lo + hi) / 2;
+    const q = bezPt(p0, c, p1, m);
+    const d = Math.hypot(q.x - p1.x, q.y - p1.y);
+    if (d > pad1) lo = m; else hi = m;
+  }
+  s1 = (lo + hi) / 2;
+  if (!(s1 > s0 + 0.02)) { s0 = 0.05; s1 = 0.95; }
+
+  const r = bezSplit(p0, c, p1, s0).right;
+  const s = (s1 - s0) / (1 - s0);
+  const seg = bezSplit(r[0], r[1], r[2], s).left;
+  return { seg: seg, full: [p0, c, p1], s0: s0, s1: s1 };
+}
+/* 估計文字寬度（CJK 視為全形） */
+function textW(s, fs) {
+  let w = 0;
+  for (const ch of String(s)) {
+    w += /[⺀-鿿＀-￯　-〿]/.test(ch) ? fs : fs * 0.56;
+  }
+  return w;
+}
+
 function renderRoutesSVG() {
   const NS = 'http://www.w3.org/2000/svg';
   const area = $('routeSvg');
   area.innerHTML = '';
   const svg = document.createElementNS(NS, 'svg');
   svg.setAttribute('class', 'route-svg');
-  svg.setAttribute('viewBox', '0 0 1120 620');
+  svg.setAttribute('viewBox', '60 60 1215 720');
+
+  /* 每種反應類型一個箭頭標記 */
   const defs = document.createElementNS(NS, 'defs');
-  [['ar', '#9fb2c4'], ['arb', '#d9a15c']].forEach(function (m) {
+  Object.keys(EDGE_COLOR).forEach(function (k) {
     const mk = document.createElementNS(NS, 'marker');
-    mk.setAttribute('id', m[0]);
+    mk.setAttribute('id', 'ar-' + k);
     mk.setAttribute('viewBox', '0 0 10 10');
-    mk.setAttribute('refX', '9'); mk.setAttribute('refY', '5');
-    mk.setAttribute('markerWidth', '7'); mk.setAttribute('markerHeight', '7');
+    mk.setAttribute('refX', '9.5'); mk.setAttribute('refY', '5');
+    mk.setAttribute('markerWidth', '6.5'); mk.setAttribute('markerHeight', '6.5');
     mk.setAttribute('orient', 'auto-start-reverse');
     const p = document.createElementNS(NS, 'path');
-    p.setAttribute('d', 'M0,0 L10,5 L0,10 z');
-    p.setAttribute('fill', m[1]);
+    p.setAttribute('d', 'M0,0.6 L10,5 L0,9.4 z');
+    p.setAttribute('fill', EDGE_COLOR[k]);
     mk.appendChild(p);
     defs.appendChild(mk);
   });
@@ -4770,60 +5091,205 @@ function renderRoutesSVG() {
 
   const nm = {};
   ORG_NODES.forEach(function (n) { nm[n.id] = n; });
+
+  /* 先建立節點外框，供標籤避讓使用 */
+  const nodeBoxes = ORG_NODES.map(function (n) {
+    const cw = n.center ? 176 : 152, ch = n.center ? 64 : 54;
+    return { x: n.x - cw / 2, y: n.y - ch / 2, w: cw, h: ch };
+  });
+  const placed = nodeBoxes.slice();
+  const hit = function (a, c) {
+    return !(a.x + a.w < c.x - 2 || c.x + c.w < a.x - 2 ||
+             a.y + a.h < c.y - 2 || c.y + c.h < a.y - 2);
+  };
+  const overlaps = function (bx) {
+    for (let i = 0; i < placed.length; i++) if (hit(bx, placed[i])) return true;
+    return false;
+  };
+
+  /* ── 連線（先畫，箭頭裁到節點邊界）── */
+  const geoms = [];
   ORG_LINKS.forEach(function (lk) {
     const a = nm[lk.from], b = nm[lk.to];
-    if (!a || !b) return;
-    const curve = ROUTE_CURVE[lk.from + '>' + lk.to];
-    const vertical = Math.abs(a.x - b.x) < 30;
-    let d, mx, my;
-    if (curve === 'none' || curve === undefined) {
-      d = 'M' + a.x + ' ' + a.y + ' L' + b.x + ' ' + b.y;
-      mx = (a.x + b.x) / 2; my = (a.y + b.y) / 2;
-    } else {
-      const cxp = vertical ? a.x + curve : (a.x + b.x) / 2;
-      const cyp = vertical ? (a.y + b.y) / 2 : (a.y + b.y) / 2 + curve;
-      d = 'M' + a.x + ' ' + a.y + ' Q' + cxp + ' ' + cyp + ' ' + b.x + ' ' + b.y;
-      mx = (a.x + 2 * cxp + b.x) / 4; my = (a.y + 2 * cyp + b.y) / 4;
-    }
+    if (!a || !b) { geoms.push(null); return; }
+    const g = linkGeom(a, b, lk.bend || 0);
+    geoms.push(g);
+    const col = EDGE_COLOR[lk.kind] || '#94a3b8';
     const p = document.createElementNS(NS, 'path');
-    p.setAttribute('d', d);
-    p.setAttribute('class', 'r-edge' + (lk.type === 'back' ? ' back' : ''));
-    p.setAttribute('marker-end', 'url(#' + (lk.type === 'back' ? 'arb' : 'ar') + ')');
+    p.setAttribute('d', 'M' + g.seg[0].x.toFixed(1) + ' ' + g.seg[0].y.toFixed(1) +
+      ' Q' + g.seg[1].x.toFixed(1) + ' ' + g.seg[1].y.toFixed(1) +
+      ' ' + g.seg[2].x.toFixed(1) + ' ' + g.seg[2].y.toFixed(1));
+    p.setAttribute('class', 'r-edge');
+    p.setAttribute('stroke', col);
+    p.setAttribute('fill', 'none');
+    p.setAttribute('marker-end', 'url(#ar-' + lk.kind + ')');
     svg.appendChild(p);
-    const t = document.createElementNS(NS, 'text');
-    t.setAttribute('x', mx); t.setAttribute('y', my - 4);
-    t.setAttribute('class', 'r-tag'); t.setAttribute('text-anchor', 'middle');
-    t.textContent = lk.label;
-    svg.appendChild(t);
   });
+
+  /* ── 試劑標籤（自動避讓節點與其他標籤）── */
+  ORG_LINKS.forEach(function (lk, li) {
+    const g = geoms[li];
+    if (!g) return;
+    const col = EDGE_COLOR[lk.kind] || '#64748b';
+    const lines = [lk.label].concat(lk.reagents || []);
+    const fs = 12, lh = 15;
+    let maxW = 0;
+    lines.forEach(function (s) { maxW = Math.max(maxW, textW(s, fs)); });
+    const bw = maxW + 14, bh = lines.length * lh + 8;
+
+    const ts = [];
+    if (lk.lt != null) ts.push(lk.lt);
+    [0.5, 0.42, 0.58, 0.34, 0.66, 0.26, 0.74, 0.18, 0.82,
+     0.62, 0.38, 0.70, 0.30, 0.14, 0.86].forEach(function (v) {
+      if (ts.indexOf(v) < 0) ts.push(v);
+    });
+    const offs = [];
+    for (let v = 0; v <= 165; v += 11) { if (v === 0) offs.push(0); else { offs.push(-v); offs.push(v); } }
+    let best = null, bestScore = Infinity;
+    const area = function (a, c) {
+      const w = Math.min(a.x + a.w, c.x + c.w) - Math.max(a.x, c.x);
+      const h = Math.min(a.y + a.h, c.y + c.h) - Math.max(a.y, c.y);
+      return (w > 0 && h > 0) ? w * h : 0;
+    };
+    for (let i = 0; i < ts.length && !best; i++) {
+      const t = g.s0 + (g.s1 - g.s0) * ts[i];
+      const pt = bezPt(g.full[0], g.full[1], g.full[2], t);
+      const tan = bezTan(g.full[0], g.full[1], g.full[2], t);
+      for (let k = 0; k < offs.length; k++) {
+        const bx = { x: pt.x - tan.y * offs[k] - bw / 2, y: pt.y + tan.x * offs[k] - bh / 2, w: bw, h: bh };
+        if (bx.x < 64 || bx.y < 64 || bx.x + bw > 1272 || bx.y + bh > 776) continue;
+        let sc = 0;
+        for (let q = 0; q < placed.length; q++) sc += area(bx, placed[q]);
+        /* 離曲線越遠扣分越多，優先貼近連線 */
+        sc += Math.abs(offs[k]) * 1.2 + Math.abs(ts[i] - 0.5) * 260;
+        if (sc === 0) { best = bx; break; }
+        if (sc < bestScore) { bestScore = sc; best = bx; }
+      }
+    }
+    if (!best) {
+      const t = (g.s0 + g.s1) / 2;
+      const pt = bezPt(g.full[0], g.full[1], g.full[2], t);
+      best = { x: pt.x - bw / 2, y: pt.y - bh / 2, w: bw, h: bh };
+    }
+    placed.push(best);
+
+    const bg = document.createElementNS(NS, 'rect');
+    bg.setAttribute('x', best.x.toFixed(1)); bg.setAttribute('y', best.y.toFixed(1));
+    bg.setAttribute('width', bw.toFixed(1)); bg.setAttribute('height', bh);
+    bg.setAttribute('rx', 7);
+    bg.setAttribute('fill', '#ffffff');
+    bg.setAttribute('fill-opacity', '0.95');
+    bg.setAttribute('stroke', col);
+    bg.setAttribute('stroke-width', '1');
+    bg.setAttribute('stroke-opacity', '0.5');
+    svg.appendChild(bg);
+
+    const tg = document.createElementNS(NS, 'text');
+    tg.setAttribute('x', (best.x + bw / 2).toFixed(1));
+    tg.setAttribute('y', (best.y + 13).toFixed(1));
+    tg.setAttribute('text-anchor', 'middle');
+    lines.forEach(function (s, i) {
+      const sp = document.createElementNS(NS, 'tspan');
+      sp.setAttribute('x', (best.x + bw / 2).toFixed(1));
+      sp.setAttribute('dy', i === 0 ? 0 : lh);
+      sp.setAttribute('class', i === 0 ? 'r-tag-name' : 'r-tag-re');
+      if (i === 0) sp.setAttribute('fill', col);
+      sp.textContent = s;
+      tg.appendChild(sp);
+    });
+    svg.appendChild(tg);
+
+    /* 標籤與曲線之間畫一條細引線，避免混淆 */
+    const anchor = bezPt(g.full[0], g.full[1], g.full[2], (g.s0 + g.s1) / 2);
+    const cxL = best.x + bw / 2, cyL = best.y + bh / 2;
+    if (Math.hypot(cxL - anchor.x, cyL - anchor.y) > 30) {
+      const ld = document.createElementNS(NS, 'line');
+      ld.setAttribute('x1', anchor.x.toFixed(1)); ld.setAttribute('y1', anchor.y.toFixed(1));
+      ld.setAttribute('x2', cxL.toFixed(1)); ld.setAttribute('y2', cyL.toFixed(1));
+      ld.setAttribute('stroke', col);
+      ld.setAttribute('stroke-width', '1');
+      ld.setAttribute('stroke-opacity', '0.35');
+      ld.setAttribute('stroke-dasharray', '3 3');
+      svg.insertBefore(ld, bg);
+    }
+  });
+
+  /* ── 節點（黃色方框，醇為中心加大） ── */
   ORG_NODES.forEach(function (n) {
+    const cw = n.center ? 176 : 152;
+    const ch = n.center ? 64 : 54;
     const g = document.createElementNS(NS, 'g');
     g.setAttribute('class', 'r-node');
+
     const r = document.createElementNS(NS, 'rect');
-    r.setAttribute('x', n.x - 76); r.setAttribute('y', n.y - 27);
-    r.setAttribute('width', 152); r.setAttribute('height', 54);
-    r.setAttribute('rx', 13);
-    let base = '#0d9488', dark = '#0a5f59';
-    if (n.cat === 'ester' || n.cat === 'polymer') { base = '#2563eb'; dark = '#1749b8'; }
-    else if (n.cat === 'aldehyde' || n.cat === 'ketone') { base = '#7c3aed'; dark = '#5b21b6'; }
-    else if (n.cat === 'alkane' || n.cat === 'halo') { base = '#0e9aa7'; dark = '#0b7f8a'; }
-    r.setAttribute('fill', state.routeNode === n.id ? dark : base);
+    r.setAttribute('x', n.x - cw / 2); r.setAttribute('y', n.y - ch / 2);
+    r.setAttribute('width', cw); r.setAttribute('height', ch);
+    r.setAttribute('rx', 10);
+    r.setAttribute('fill', n.center ? '#fde68a' : '#fefce8');
+    r.setAttribute('stroke', state.routeNode === n.id ? '#d97706' : '#facc15');
+    r.setAttribute('stroke-width', n.center ? 2.5 : (state.routeNode === n.id ? 2.5 : 1.5));
     g.appendChild(r);
+
+    if (n.center) {
+      const bd = document.createElementNS(NS, 'text');
+      bd.setAttribute('x', n.x); bd.setAttribute('y', n.y - ch / 2 - 7);
+      bd.setAttribute('class', 'r-center-badge'); bd.setAttribute('text-anchor', 'middle');
+      bd.textContent = '★ 轉化樞紐';
+      g.appendChild(bd);
+    }
+
     const t1 = document.createElementNS(NS, 'text');
-    t1.setAttribute('x', n.x); t1.setAttribute('y', n.y - 3);
+    t1.setAttribute('x', n.x); t1.setAttribute('y', n.y - (n.center ? 3 : 2));
     t1.setAttribute('class', 'r-label'); t1.setAttribute('text-anchor', 'middle');
+    if (n.center) t1.setAttribute('style', 'font-size:16px');
     t1.textContent = n.label;
     g.appendChild(t1);
+
     const t2 = document.createElementNS(NS, 'text');
-    t2.setAttribute('x', n.x); t2.setAttribute('y', n.y + 15);
+    t2.setAttribute('x', n.x); t2.setAttribute('y', n.y + (n.center ? 18 : 16));
     t2.setAttribute('class', 'r-sub'); t2.setAttribute('text-anchor', 'middle');
+    if (n.center) t2.setAttribute('style', 'font-size:12px');
     t2.textContent = n.sub;
     g.appendChild(t2);
+
     g.onclick = function () { state.routeNode = n.id; renderRoutesSVG(); renderRouteDetail(); };
     svg.appendChild(g);
   });
+
   area.appendChild(svg);
 }
+function renderRouteLegend() {
+  const box = $('routeLegend');
+  box.innerHTML = '';
+  Object.keys(EDGE_COLOR).forEach(function (k) {
+    const s = el('span');
+    const i = el('i');
+    i.style.background = EDGE_COLOR[k];
+    i.style.height = '4px';
+    s.appendChild(i);
+    s.appendChild(document.createTextNode(EDGE_KIND_LABEL[k]));
+    box.appendChild(s);
+  });
+  const box2 = $('routeSymbols');
+  if (!box2) return;
+  box2.innerHTML = '';
+  const h = el('div', null, '符號說明');
+  h.style.cssText = 'font-size:14.5px;font-weight:750;margin-bottom:10px;letter-spacing:-.2px';
+  box2.appendChild(h);
+  const g = el('div');
+  g.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:9px';
+  ROUTE_SYMBOLS.forEach(function (s) {
+    const d = el('div');
+    d.style.cssText = 'font-size:13px;line-height:1.6;color:var(--tx2)';
+    const k = el('b', 'mono', s[0]);
+    k.style.cssText = 'color:var(--pr);font-weight:750;margin-right:7px';
+    d.appendChild(k);
+    d.appendChild(document.createTextNode(s[1]));
+    g.appendChild(d);
+  });
+  box2.appendChild(g);
+}
+
 function renderRouteDetail() {
   const box = $('routeDetail');
   box.innerHTML = '';
@@ -4852,9 +5318,15 @@ function renderRouteDetail() {
     c.appendChild(h);
     ins.forEach(function (l) {
       const d = el('div', 'eq-item');
-      d.style.borderLeftColor = 'var(--pr)';
-      d.appendChild(el('div', 'n', '由 ' + label(l.from)));
+      d.style.borderLeftColor = EDGE_COLOR[l.kind] || 'var(--pr)';
+      d.appendChild(el('div', 'n', '由 ' + label(l.from) + '　→　' + l.label));
       d.appendChild(el('div', 'e', l.note));
+      (l.reagents || []).forEach(function (r) {
+        const rg = el('div', 'note', '• ' + r);
+        rg.style.color = EDGE_COLOR[l.kind] || 'var(--pr)';
+        rg.style.fontWeight = '700';
+        d.appendChild(rg);
+      });
       d.appendChild(el('div', 'note', '條件：' + l.cond));
       c.appendChild(d);
     });
@@ -4865,9 +5337,15 @@ function renderRouteDetail() {
     c.appendChild(h);
     outs.forEach(function (l) {
       const d = el('div', 'eq-item');
-      d.style.borderLeftColor = 'var(--am)';
-      d.appendChild(el('div', 'n', '→ ' + label(l.to)));
+      d.style.borderLeftColor = EDGE_COLOR[l.kind] || 'var(--am)';
+      d.appendChild(el('div', 'n', '→ ' + label(l.to) + '　（' + l.label + '）'));
       d.appendChild(el('div', 'e', l.note));
+      (l.reagents || []).forEach(function (r) {
+        const rg = el('div', 'note', '• ' + r);
+        rg.style.color = EDGE_COLOR[l.kind] || 'var(--am)';
+        rg.style.fontWeight = '700';
+        d.appendChild(rg);
+      });
       d.appendChild(el('div', 'note', '條件：' + l.cond));
       c.appendChild(d);
     });
@@ -5184,7 +5662,7 @@ function openStats() {
   ht.appendChild(el('h2', null, '📊 學習統計'));
   ht.appendChild(el('div', 'en', '進度只儲存在你的瀏覽器'));
   head.appendChild(ht);
-  const close = el('button', 'close-btn', '✕');
+  const close = el('button', 'close-btn modal-close', '✕');
   close.onclick = closeModal;
   head.appendChild(close);
   box.appendChild(head);
@@ -5234,6 +5712,7 @@ function openStats() {
 
 /* ══════════ 渲染全部 ══════════ */
 function renderAll() {
+  renderDrawer();
   renderHome();
   renderCardFilter();
   renderCards('');
@@ -5248,6 +5727,7 @@ function renderAll() {
   renderCpdCats();
   renderCompounds('');
   renderRoutesSVG();
+  renderRouteLegend();
   renderRouteDetail();
   renderRouteCards();
   renderEqCats();
@@ -5260,10 +5740,10 @@ function renderAll() {
 
 /* ══════════ 事件綁定 ══════════ */
 function bind() {
-  /* 模式列 */
-  document.querySelectorAll('#modeBar .schip').forEach(function (b) {
-    b.onclick = function () { go(b.dataset.mode); };
-  });
+  /* 目錄抽屜 */
+  $('navBtn').onclick = function () { toggleDrawer(); };
+  $('drawerClose').onclick = function () { closeDrawer(); };
+  $('drawerMask').onclick = function () { closeDrawer(); };
 
   /* 刷題模式切換 */
   document.querySelectorAll('#quizSeg button').forEach(function (b) {
@@ -5322,7 +5802,7 @@ function bind() {
 
   /* 鍵盤 */
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closeModal();
+    if (e.key === 'Escape') { closeModal(); closeDrawer(); }
     if (state.mode === 'flash' && state.fcQueue.length) {
       if (e.code === 'Space') {
         e.preventDefault();
@@ -5355,14 +5835,15 @@ renderAll();
 go('home');
 
 </script>
-<div id="bootErr" style="display:none;position:fixed;inset:0;z-index:999;background:#fff;padding:40px 24px;overflow:auto">
+
+<div id="bootErr" style="display:none;position:fixed;inset:0;z-index:9999;background:#fff;padding:40px 24px;overflow:auto">
   <div style="max-width:620px;margin:0 auto">
     <h2 style="font-size:20px;font-weight:800;margin-bottom:12px;color:#dc2626">⚠️ 程式未載入完成</h2>
-    <p style="font-size:15px;line-height:1.8;color:#374151;margin-bottom:14px">頁面的互動功能沒有啟動，通常是因為 <b>assets 資料夾沒有跟 index.html 放在一起</b>，或是以純文字方式開啟了檔案。</p>
+    <p style="font-size:15px;line-height:1.8;color:#374151;margin-bottom:14px">頁面的互動功能沒有啟動，通常是檔案在傳送過程中被截斷，或是以純文字方式開啟。</p>
     <div style="background:#f8fafc;border:1px solid #e4e7ec;border-radius:10px;padding:14px 16px;font-size:14px;line-height:1.85;color:#374151">
-      <b>請檢查：</b><br>1. 解壓縮後，<b>index.html</b> 與 <b>assets</b> 資料夾要在同一層<br>
+      <b>請檢查：</b><br>1. 重新下載完整的 index.html（約 250 KB）<br>
       2. 用瀏覽器開啟（Chrome / Safari / Edge），不要用記事本或文件 App<br>
-      3. 若是放在網站上，確認相關檔案都已上傳
+      3. 若在網站上，確認 index.html 已完整上傳
     </div>
   </div>
 </div>
