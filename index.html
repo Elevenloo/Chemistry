@@ -110,6 +110,13 @@ header{
   font-family:inherit;transition:.15s;flex-shrink:0;
 }
 .cd:hover{border-color:#fb923c}
+/* 考試當日／已考完的樣式 */
+.cd.today{background:linear-gradient(180deg,#fff1f2,#ffe4e6);border-color:#fb7185}
+.cd.today b{color:#be123c;font-size:17px}
+.cd.today small{color:#9f1239}
+.cd.done{background:linear-gradient(180deg,#f1f5f9,#e2e8f0);border-color:#cbd5e1}
+.cd.done b{color:#475569;font-size:15px}
+.cd.done small{color:#64748b}
 .cd b{font-size:19px;font-weight:800;color:#c2410c;letter-spacing:-.5px;
   font-variant-numeric:tabular-nums;line-height:1}
 .cd small{font-size:11.5px;color:#9a3412;font-weight:600}
@@ -570,6 +577,10 @@ input[type=range]::-moz-range-thumb{
 .r-node{cursor:pointer}
 .r-node rect{transition:.18s}
 .r-node:hover rect{filter:drop-shadow(0 4px 10px rgba(217,119,6,.4))}
+/* 焦點模式：非相關節點淡化 */
+.r-node.dim rect{opacity:.42}
+.r-node.dim:hover rect{filter:none}
+.r-dot{font-family:var(--font);font-size:9px;font-weight:800;fill:#fff;pointer-events:none}
 .r-label{font-family:var(--font);font-size:13.5px;font-weight:750;fill:#141922;pointer-events:none}
 .r-sub{font-family:var(--mono);font-size:10.5px;fill:#6b7280;pointer-events:none}
 .r-center-badge{font-family:var(--font);font-size:10.5px;font-weight:800;fill:#b45309;pointer-events:none}
@@ -1041,7 +1052,9 @@ footer{
         <h2>有機轉化圖</h2>
         <div class="d">官能團之間的互換路線：醇 → 酯、醇 → 醛 → 酸、酯 → 肥皂…</div>
       </div>
-      <div class="hint b">🔄 <b>醇置於圖中央</b>作轉化樞紐；每個箭頭上標示該轉化所需的試劑與條件。點擊任一節點可查看該官能團的完整反應清單。</div>
+      <div class="hint b">🔄 <b>醇置於圖中央</b>作轉化樞紐；每個箭頭上標示該轉化所需的試劑與條件。</div>
+      <div class="chips" id="routeLayers" style="margin-top:12px"></div>
+      <div id="routeFocusBar" style="margin-top:10px"></div>
       <div class="route-box"><div id="routeSvg"></div></div>
       <div class="legend" id="routeLegend"></div>
       <div class="card pad" id="routeSymbols" style="margin-top:14px"></div>
@@ -3215,142 +3228,154 @@ const COMPOUND_CATS = [
    ============================================================ */
 
 const ORG_NODES = [
-  { id: 'alkane',  label: '烷烴',   sub: 'CₙH₂ₙ₊₂',  x: 170, y: 200, cat: 'alkane',
+  { id: 'alkane',  label: '烷烴',   sub: 'CₙH₂ₙ₊₂',  x: 190, y: 200, cat: 'alkane',
     example: 'CH₃CH₃（乙烷）', desc: '飽和烴，只有 C–C 單鍵，化學性質較穩定。',
     reactions: ['與 Cl₂／Br₂ 在紫外光下取代 → 鹵烷 + HX', '完全燃燒 → CO₂ + H₂O；不完全燃燒 → CO／C', '催化裂解 → 烯烴 + 短鏈烷烴'] },
 
-  { id: 'alkene',  label: '烯烴',   sub: 'CₙH₂ₙ',    x: 170, y: 420, cat: 'alkene',
+  { id: 'alkene',  label: '烯烴',   sub: 'CₙH₂ₙ',    x: 185, y: 430, cat: 'alkene',
     example: 'CH₂=CH₂（乙烯）', desc: '含 C=C 雙鍵，不飽和，主要發生加成反應。',
     reactions: ['加 H₂（Ni／Pt 催化）→ 烷烴', '加 X₂ → 二鹵烷（溴水褪色）', '加 HX → 鹵烷', '加 H₂O(g)（H₃PO₄ 催化）→ 醇', '加成聚合 → 聚合物'] },
 
-  { id: 'dihalo',  label: '二鹵烷', sub: 'R–X₂',     x: 170, y: 660, cat: 'halo',
+  { id: 'dihalo',  label: '二鹵烷', sub: 'R–X₂',     x: 205, y: 665, cat: 'halo',
     example: 'CH₂BrCH₂Br（1,2-二溴乙烷）', desc: '兩個鹵素原子分別接在相鄰碳上，由烯烴加鹵素生成。',
     reactions: ['與 NaOH(aq) 加熱 → 二元醇', '可用於製備二醇、聚合物單體'] },
 
-  { id: 'halo',    label: '鹵烷',   sub: 'R–X',      x: 390, y: 300, cat: 'halo',
+  { id: 'halo',    label: '鹵烷',   sub: 'R–X',      x: 415, y: 290, cat: 'halo',
     example: 'CH₃CH₂Br（溴乙烷）', desc: '鹵素原子取代了氫的有機分子，是重要的合成中間體。',
     reactions: ['與 NaOH(aq) 回流加熱 → 醇（取代／水解）', '與 NaOH 的乙醇溶液加熱 → 烯烴（消去）', '與 NH₃ 的乙醇溶液（密封加熱）→ 胺'] },
 
-  { id: 'ketone',  label: '酮',     sub: 'R–CO–R′',  x: 390, y: 130, cat: 'ketone',
+  { id: 'ketone',  label: '酮',     sub: 'R–CO–R′',  x: 400, y: 145, cat: 'ketone',
     example: 'CH₃COCH₃（丙酮）', desc: '由二級醇氧化生成，不易再被氧化。常用作溶劑。',
     reactions: ['不易被氧化（與醛的區別）', '不發生銀鏡反應、不與斐林試劑反應', '可作溶劑'] },
 
-  { id: 'alcohol', label: '醇',     sub: 'R–OH',     x: 640, y: 420, cat: 'alcohol',
+  { id: 'alcohol', label: '醇',     sub: 'R–OH',     x: 655, y: 430, cat: 'alcohol',
     center: true,
     example: 'CH₃CH₂OH（乙醇）', desc: '含羥基 –OH。分為一級、二級、三級醇，氧化行為不同，是有機轉化的樞紐。',
     reactions: ['與 Na 反應 → 放出 H₂', '與羧酸酯化 → 酯 + 水', '一級：氧化 → 醛 → 羧酸；二級：氧化 → 酮', '與濃 H₂SO₄ 加熱脫水 → 烯烴（消去）', '與 PCl₅／HX 反應 → 鹵烷'] },
 
-  { id: 'aldehyde',label: '醛',     sub: 'R–CHO',    x: 640, y: 170, cat: 'aldehyde',
+  { id: 'aldehyde',label: '醛',     sub: 'R–CHO',    x: 655, y: 195, cat: 'aldehyde',
     example: 'CH₃CHO（乙醛）', desc: '含 –CHO，由一級醇溫和氧化（蒸餾）取得，具還原性。',
     reactions: ['氧化 → 羧酸（回流加熱）', 'Tollens 試劑 → 銀鏡；斐林試劑 → 磚紅沉澱', '還原 → 一級醇（LiAlH₄／NaBH₄）'] },
 
-  { id: 'acid',    label: '羧酸',   sub: 'R–COOH',   x: 920, y: 300, cat: 'acid',
+  { id: 'acid',    label: '羧酸',   sub: 'R–COOH',   x: 960, y: 235, cat: 'acid',
     example: 'CH₃COOH（乙酸）', desc: '含羧基，弱酸性，可發生典型酸反應。',
     reactions: ['與金屬／碳酸鹽反應 → 放出 H₂／CO₂', '與醇酯化（濃 H₂SO₄、加熱）→ 酯', '與鹼中和 → 羧酸鹽', '與 NH₃ 加熱 → 醯胺'] },
 
-  { id: 'ester',   label: '酯',     sub: 'R–COO–R′', x: 920, y: 570, cat: 'ester',
+  { id: 'ester',   label: '酯',     sub: 'R–COO–R′', x: 1010, y: 470, cat: 'ester',
     example: 'CH₃COOCH₂CH₃（乙酸乙酯）', desc: '有果香味，難溶於水，常用作溶劑與香料。',
     reactions: ['酸性水解 → 羧酸 + 醇（可逆）', '鹼性水解（皂化）→ 羧酸鹽 + 醇（不可逆）', '與 NH₃ 反應 → 醯胺 + 醇'] },
 
-  { id: 'amide',   label: '醯胺',   sub: 'R–CONH₂',  x: 1130, y: 430, cat: 'amide',
+  { id: 'amide',   label: '醯胺',   sub: 'R–CONH₂',  x: 1210, y: 630, cat: 'amide',
     example: 'CH₃CONH₂（乙醯胺）', desc: '含 –CONH₂。可由羧酸／酯與 NH₃ 反應生成，是尼龍等聚醯胺的結構單元。',
     reactions: ['羧酸 + NH₃ → 銨鹽，再加熱脫水 → 醯胺', '酯 + NH₃ → 醯胺 + 醇', '水解 → 羧酸（或羧酸鹽）+ NH₃'] },
 
-  { id: 'soap',    label: '羧酸鹽（肥皂）', sub: 'R–COO⁻Na⁺', x: 640, y: 700, cat: 'soap',
+  { id: 'soap',    label: '羧酸鹽（肥皂）', sub: 'R–COO⁻Na⁺', x: 600, y: 720, cat: 'soap',
     example: 'C₁₇H₃₅COONa（硬脂酸鈉）', desc: '酯鹼性水解（皂化）的產物，具清潔作用。',
     reactions: ['親油尾插入油污、親水頭向外 → 乳化', '硬水中生成不溶浮渣（scum）', '與稀酸反應 → 析出羧酸'] }
 ];
 
 /* bend：垂直於連線的彎曲量（px），正負代表彎向不同側，用來分開雙向箭頭 */
 const ORG_LINKS = [
-  { from: 'alkane',  to: 'halo',    kind: 'sub',  bend: 0,
+  { from: 'alkane',  to: 'halo',    kind: 'sub', g: 'swap',  bend: 0,
     label: '取代', reagents: ['X₂（Cl₂／Br₂）', '紫外光 UV'],
     note: '取代反應：紫外光下鹵素逐步取代 H', cond: '紫外光（UV）照射' },
 
-  { from: 'alkane',  to: 'alkene',  kind: 'elim', bend: -60,
+  { from: 'alkane',  to: 'alkene',  kind: 'elim', g: 'swap', bend: -60,
     label: '裂解', reagents: ['催化裂解'],
     note: '大分子烷烴斷裂生成較小烯烴 + 短鏈烷烴', cond: '約 500 °C、沸石催化劑' },
 
-  { from: 'alkene',  to: 'alkane',  kind: 'add',  bend: 60,
+  { from: 'alkene',  to: 'alkane',  kind: 'add', g: 'swap',  bend: 60,
     label: '加氫', reagents: ['H₂ / Ni 或 Pt', '150 °C'],
     note: '加成反應：雙鍵打開加上兩個 H', cond: 'Ni／Pt 催化、加熱' },
 
-  { from: 'alkene',  to: 'dihalo',  kind: 'add',  bend: 0,
+  { from: 'alkene',  to: 'dihalo',  kind: 'add', g: 'swap',  bend: 0,
     label: '加鹵素', reagents: ['X₂（Br₂ 水）', '溴水褪色'],
     note: '加成反應：兩個鹵素分別加到雙鍵兩端', cond: '常溫（溴水由橙棕變無色）' },
 
-  { from: 'alkene',  to: 'halo',    kind: 'add',  bend: 0,
+  { from: 'alkene',  to: 'halo',    kind: 'add', g: 'swap',  bend: 0,
     label: '加 HX', reagents: ['HX（HCl／HBr）'],
     note: '加成反應：鹵化氫加到雙鍵上生成鹵烷', cond: '常溫' },
 
-  { from: 'alkene',  to: 'alcohol', kind: 'add',  bend: -70,
+  { from: 'alkene',  to: 'alcohol', kind: 'add', g: 'swap',  bend: -70,
     label: '加水', reagents: ['H₂O(g)', 'H₃PO₄ 催化、高溫高壓'],
     note: '工業製醇：乙烯與水蒸汽加成生成乙醇', cond: 'H₃PO₄ 催化、約 300 °C、高壓' },
 
-  { from: 'alcohol', to: 'alkene',  kind: 'elim', bend: 70,
+  { from: 'alcohol', to: 'alkene',  kind: 'elim', g: 'swap', bend: 70,
     label: '脫水', reagents: ['濃 H₂SO₄，Δ', '或 Al₂O₃ 加熱'],
     note: '消去反應：脫去 –OH 與相鄰碳上的 H 生成 C=C', cond: '濃 H₂SO₄ 加熱（約 170 °C）或 Al₂O₃ 熱管' },
 
-  { from: 'halo',    to: 'alcohol', kind: 'hyd',  bend: -35,
+  { from: 'halo',    to: 'alcohol', kind: 'hyd', g: 'swap',  bend: -35,
     label: '水解', reagents: ['NaOH(aq)', '回流加熱'],
     note: '取代（水解）：–X 被 –OH 取代生成醇', cond: 'NaOH(aq)、回流加熱' },
 
-  { from: 'alcohol', to: 'halo',    kind: 'sub',  bend: 95,
+  { from: 'alcohol', to: 'halo',    kind: 'sub', g: 'swap',  bend: 95,
     label: '鹵化', reagents: ['PCl₅ / PCl₃', '或 HX（ZnCl₂）'],
     note: '取代反應：–OH 被鹵素取代生成鹵烷', cond: '鹵化劑（PCl₅ 常溫，產生白煙 HCl）' },
 
-  { from: 'alcohol', to: 'aldehyde',kind: 'ox',   bend: 0,
+  { from: 'alcohol', to: 'aldehyde',kind: 'ox', g: 'redox',   bend: 0,
     label: '氧化（1°醇）', reagents: ['[O] 蒸餾', 'K₂Cr₂O₇ / H⁺'],
     note: '一級醇氧化成醛，須立即蒸餾餾出以免繼續氧化成酸', cond: '酸性 K₂Cr₂O₇，蒸餾（橙 → 綠）' },
 
-  { from: 'alcohol', to: 'ketone',  kind: 'ox',   bend: -45,
+  { from: 'alcohol', to: 'ketone',  kind: 'ox', g: 'redox',   bend: -45,
     label: '氧化（2°醇）', reagents: ['[O] 回流', 'K₂Cr₂O₇ / H⁺'],
     note: '二級醇氧化成酮，酮不再被氧化', cond: '酸性 K₂Cr₂O₇，回流加熱' },
 
-  { from: 'aldehyde',to: 'acid',    kind: 'ox',   bend: 0,
+  { from: 'aldehyde',to: 'acid',    kind: 'ox', g: 'redox',   bend: 0,
     label: '氧化', reagents: ['[O] 回流', 'K₂Cr₂O₇ / H⁺'],
     note: '醛進一步氧化成羧酸', cond: '酸性 K₂Cr₂O₇，回流加熱（橙 → 綠）' },
 
-  { from: 'aldehyde',to: 'alcohol', kind: 'red',  bend: 55,
+  { from: 'aldehyde',to: 'alcohol', kind: 'red', g: 'redox',  bend: 55,
     label: '還原', reagents: ['LiAlH₄ / NaBH₄', '[H]'],
     note: '醛還原回一級醇', cond: 'LiAlH₄（乾醚）或 NaBH₄' },
 
-  { from: 'alcohol', to: 'ester',   kind: 'est',  bend: 0,
+  { from: 'alcohol', to: 'ester',   kind: 'est', g: 'ester',  bend: 0,
     label: '酯化', reagents: ['+ 羧酸', '濃 H₂SO₄，Δ（可逆 ⇌）'],
     note: '醇 + 羧酸 → 酯 + 水（最重要的一條路線）', cond: '濃 H₂SO₄ 催化、加熱、可逆' },
 
-  { from: 'acid',    to: 'ester',   kind: 'est',  bend: 60,  lt: 0.22,
+  { from: 'acid',    to: 'ester',   kind: 'est', g: 'ester',  bend: 60,  lt: 0.22,
     label: '酯化', reagents: ['+ 醇', '濃 H₂SO₄，Δ（可逆 ⇌）'],
     note: '羧酸 + 醇 → 酯 + 水', cond: '濃 H₂SO₄ 催化、加熱、可逆' },
 
-  { from: 'ester',   to: 'acid',    kind: 'hyd',  bend: -95, lt: 0.5,
+  { from: 'ester',   to: 'acid',    kind: 'hyd', g: 'ester',  bend: -95, lt: 0.5,
     label: '水解', reagents: ['1. H⁺／加酸水解（可逆 ⇌）', '2. OH⁻／加鹼水解（不可逆 →）'],
     note: '酸性水解生成羧酸 + 醇（可逆）；鹼性水解生成羧酸鹽 + 醇（不可逆）',
     cond: '稀 H₂SO₄ 回流（可逆）／ NaOH(aq) 回流（不可逆）' },
 
-  { from: 'ester',   to: 'soap',    kind: 'hyd',  bend: 0,
+  { from: 'ester',   to: 'soap',    kind: 'hyd', g: 'ester',  bend: 0,
     label: '皂化', reagents: ['NaOH(aq)，Δ', '不可逆 →'],
     note: '酯的鹼性水解，生成羧酸鹽（肥皂）+ 醇', cond: 'NaOH(aq)、回流加熱、不可逆' },
 
-  { from: 'ester',   to: 'amide',   kind: 'est',  bend: 0,
+  { from: 'ester',   to: 'amide',   kind: 'est', g: 'ester',  bend: 0,
     label: '氨解', reagents: ['NH₃（乙醇溶液）'],
     note: '酯 + 氨 → 醯胺 + 醇', cond: 'NH₃ 的乙醇溶液、加熱' },
 
-  { from: 'acid',    to: 'amide',   kind: 'est',  bend: 0,
+  { from: 'acid',    to: 'amide',   kind: 'est', g: 'ester',  bend: 0,
     label: '醯胺化', reagents: ['NH₃ → 銨鹽', '再加熱脫水 Δ'],
     note: '羧酸先與氨生成羧酸銨，再加熱脫水生成醯胺', cond: '加入 NH₃ 生成銨鹽後強熱脫水' },
 
-  { from: 'acid',    to: 'soap',    kind: 'neu',  bend: -60, lt: 0.28,
+  { from: 'acid',    to: 'soap',    kind: 'neu', g: 'ester',  bend: -60, lt: 0.28,
     label: '中和', reagents: ['NaOH(aq)'],
     note: '羧酸與鹼中和生成羧酸鹽與水', cond: 'NaOH(aq)、常溫' },
 
-  { from: 'amide',   to: 'acid',    kind: 'hyd',  bend: 60,
+  { from: 'amide',   to: 'acid',    kind: 'hyd', g: 'ester',  bend: 60,
     label: '水解', reagents: ['H⁺ 或 OH⁻，Δ'],
     note: '醯胺水解生成羧酸（酸性）或羧酸鹽（鹼性）', cond: '稀酸或稀鹼、回流加熱' },
 
-  { from: 'dihalo',  to: 'alcohol', kind: 'hyd',  bend: -80,
+  { from: 'dihalo',  to: 'alcohol', kind: 'hyd', g: 'swap',  bend: -80,
     label: '水解', reagents: ['NaOH(aq)，Δ'],
     note: '二鹵烷水解生成二元醇', cond: 'NaOH(aq)、回流加熱' }
+];
+
+/* 圖層分組：22 條連線同時出現太擠，讓使用者只看某一類反應 */
+const ROUTE_LAYERS = [
+  { id: 'all',   ic: '🗺', t: '全圖',           en: 'All',
+    s: '全部 22 條轉化',                en_s: 'All 22 conversions' },
+  { id: 'redox', ic: '🔴', t: '氧化還原',       en: 'Redox',
+    s: '醇 ⇄ 醛 ⇄ 羧酸、酮',            en_s: 'Alcohol ⇄ aldehyde ⇄ acid, ketone' },
+  { id: 'swap',  ic: '🔵', t: '取代·加成·消去', en: 'Substitute / Add / Eliminate',
+    s: '烷烴、烯烴、鹵烷、二鹵烷互換',  en_s: 'Alkane, alkene, halogenoalkane, dihalo-' },
+  { id: 'ester', ic: '🟣', t: '酯化·水解·中和', en: 'Esterify / Hydrolyse / Neutralise',
+    s: '酯、羧酸鹽（肥皂）、醯胺',      en_s: 'Ester, carboxylate (soap), amide' }
 ];
 
 /* 箭頭顏色（依反應類型） */
@@ -5977,6 +6002,24 @@ const EN_UI = {
     'Alcohol sits at the centre as the conversion hub; each arrow is labelled with the reagents and conditions required. Tap any node for its full list of reactions.',
   '沒有符合的元素。': 'No matching elements.',
 
+  /* ── 有機轉化圖：圖層與焦點 ── */
+  /* ── 倒數計時 ── */
+  '天後考化學': 'days to Chemistry',
+  '今日考化學': 'Chemistry today',
+  '已放榜': 'Released',
+  '全圖': 'All',
+  '氧化還原': 'Redox',
+  '取代·加成·消去': 'Substitute / Add / Eliminate',
+  '酯化·水解·中和': 'Esterify / Hydrolyse / Neutralise',
+  '全部 22 條轉化': 'All 22 conversions',
+  '醇 ⇄ 醛 ⇄ 羧酸、酮': 'Alcohol ⇄ aldehyde ⇄ acid, ketone',
+  '烷烴、烯烴、鹵烷、二鹵烷互換': 'Alkane, alkene, halogenoalkane, dihalo-',
+  '酯、羧酸鹽（肥皂）、醯胺': 'Ester, carboxylate (soap), amide',
+  '只看 ': 'Focus: ',
+  '✕ 回到全圖': '✕ Show all',
+  '💡 圖太擠？點上方圖層只看某一類反應，或點任一節點只看它的相關反應。':
+    '💡 Too crowded? Use the layers above to view one reaction type, or tap a node to see only its reactions.',
+
   /* ── 錯題本 ── */
   '錯題本': 'Wrong Question Book',
   '答錯的題目會自動收錄，也可以手動加入任何一題。每一題都能單獨移除，或勾選後批次刪除。':
@@ -6219,6 +6262,8 @@ const state = {
   eqCat: 'all',
   ptCat: 'all',
   routeNode: 'alcohol',
+  routeLayer: 'all',
+  routeFocus: null,
   session: null
 };
 
@@ -6504,15 +6549,51 @@ function go(m) {
 }
 
 /* ══════════ 倒數計時 ══════════ */
+/* 倒數目標：2027 年 4 月 15 日（星期四）——化學科（卷一、卷二）考試日
+   依考評局《2027 年考試時間表》（考試通告第 8 號 2025/2026）：
+   · 筆試期：2027 年 4 月 6 日至 5 月 3 日
+   · 化學（一）及（二）：2027 年 4 月 15 日
+   · 放榜：2027 年 7 月 14 日（暫定）
+   確實安排仍以考評局最新公布為準。 */
+const EXAM_DATE = new Date(2027, 3, 15);   // 化學科考試日
+const EXAM_START = new Date(2027, 3, 6);   // 筆試開考日
+const RESULT_DATE = new Date(2027, 6, 14); // 放榜日（暫定）
+
+function dayGap(a, b) {
+  const MS = 86400000;
+  const utcA = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+  const utcB = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+  return Math.round((utcB - utcA) / MS);
+}
+
 function renderCountdown() {
-  // 以 2027 年 4 月 1 日作估算基準；確實日期請以考評局公布為準
-  const target = new Date(2027, 3, 1);
   const now = new Date();
-  const d = Math.max(0, Math.ceil((target - now) / 86400000));
+  const d = dayGap(now, EXAM_DATE);
   const n = $('cdNum');
-  if (n) n.textContent = d;
   const btn = $('cdBtn');
-  if (btn) btn.title = '距離 2027 DSE 開考約 ' + d + ' 天（以 4 月初估算，確實日期以考評局公布為準）';
+  const small = btn ? btn.querySelector('small') : null;
+
+  if (d > 0) {
+    if (n) n.textContent = d;
+    if (small) small.textContent = L('天後考化學', 'days to Chemistry');
+    if (btn) btn.title = L(
+      '距離 2027 DSE 化學科考試（4 月 15 日）尚有 ' + d + ' 天　·　筆試期 4 月 6 日 – 5 月 3 日　·　放榜 7 月 14 日（暫定，以考評局公布為準）',
+      d + ' days to the 2027 HKDSE Chemistry exam (15 Apr)　·　Written exams 6 Apr – 3 May　·　Results 14 Jul (tentative; subject to HKEAA)');
+    if (btn) btn.className = 'cd';
+  } else if (d === 0) {
+    if (n) n.textContent = '!';
+    if (small) small.textContent = L('今日考化學', 'Chemistry today');
+    if (btn) btn.title = L('今天是 2027 DSE 化學科考試日，加油！', 'The 2027 HKDSE Chemistry exam is today — good luck!');
+    if (btn) btn.className = 'cd today';
+  } else {
+    const dr = dayGap(now, RESULT_DATE);
+    if (n) n.textContent = '🎓';
+    if (small) small.textContent = dr > 0 ? L('距放榜 ' + dr + ' 天', 'Results in ' + dr) : L('已放榜', 'Released');
+    if (btn) btn.title = L(
+      '化學科考試已於 2027 年 4 月 15 日舉行。放榜日 2027 年 7 月 14 日（暫定）。',
+      'The Chemistry exam was held on 15 April 2027. Results: 14 July 2027 (tentative).');
+    if (btn) btn.className = 'cd done';
+  }
 }
 
 /* ══════════ 進度 ══════════ */
@@ -8167,13 +8248,51 @@ function textW(s, fs) {
   return w;
 }
 
+/* 實際量測文字寬度：估算式對粗體中文容易低估，會讓標籤框比實際文字窄而壓到節點。
+   用一個畫面外的 SVG 量一次真實寬度，避讓才會準。 */
+let _mSvg = null;
+function measureW(s, fs, bold) {
+  try {
+    if (!_mSvg) {
+      _mSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      _mSvg.setAttribute('style', 'position:absolute;left:-9999px;top:0;width:0;height:0;overflow:hidden;pointer-events:none');
+      document.body.appendChild(_mSvg);
+    }
+    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    t.setAttribute('style', 'font-family:var(--font);font-size:' + fs + 'px;font-weight:' + (bold ? 750 : 600));
+    t.textContent = s;
+    _mSvg.appendChild(t);
+    const w = t.getComputedTextLength ? t.getComputedTextLength() : 0;
+    _mSvg.removeChild(t);
+    return w > 0 ? w : textW(s, fs);
+  } catch (e) { return textW(s, fs); }
+}
+
 function renderRoutesSVG() {
   const NS = 'http://www.w3.org/2000/svg';
   const area = $('routeSvg');
   area.innerHTML = '';
   const svg = document.createElementNS(NS, 'svg');
   svg.setAttribute('class', 'route-svg');
-  svg.setAttribute('viewBox', '60 60 1215 720');
+  svg.setAttribute('viewBox', '55 55 1300 810');
+
+  /* 圖層過濾 + 焦點（只看某節點相關的反應） */
+  const layer = state.routeLayer || 'all';
+  const focus = state.routeFocus || null;
+  const layerOn = function (lk) { return layer === 'all' || lk.g === layer; };
+  const focusOn = function (lk) { return !focus || lk.from === focus || lk.to === focus; };
+  const links = ORG_LINKS.map(routeLinkF).filter(function (lk) {
+    return layerOn(lk) && focusOn(lk);
+  });
+  /* 焦點模式下，與該節點無關的節點淡化 */
+  const nearNodes = {};
+  if (focus) {
+    nearNodes[focus] = true;
+    ORG_LINKS.map(routeLinkF).forEach(function (lk) {
+      if (lk.from === focus) nearNodes[lk.to] = true;
+      if (lk.to === focus) nearNodes[lk.from] = true;
+    });
+  }
 
   /* 每種反應類型一個箭頭標記 */
   const defs = document.createElementNS(NS, 'defs');
@@ -8195,10 +8314,15 @@ function renderRoutesSVG() {
   const nm = {};
   ORG_NODES.map(routeNodeF).forEach(function (n) { nm[n.id] = n; });
 
+  /* 節點尺寸：依文字長度自適應，避免長標籤（如「羧酸鹽（肥皂）」）擠出框外 */
+  const nodeSize = function (n) {
+    const w = Math.max(n.center ? 176 : 148, measureW(n.label, n.center ? 16 : 13.5, true) + 30, measureW(n.sub, 11, false) + 24);
+    return { w: w, h: n.center ? 64 : 54 };
+  };
   /* 先建立節點外框，供標籤避讓使用 */
   const nodeBoxes = ORG_NODES.map(function (n) {
-    const cw = n.center ? 176 : 152, ch = n.center ? 64 : 54;
-    return { x: n.x - cw / 2, y: n.y - ch / 2, w: cw, h: ch };
+    const s = nodeSize(n);
+    return { x: n.x - s.w / 2, y: n.y - s.h / 2, w: s.w, h: s.h };
   });
   const placed = nodeBoxes.slice();
   const hit = function (a, c) {
@@ -8212,7 +8336,7 @@ function renderRoutesSVG() {
 
   /* ── 連線（先畫，箭頭裁到節點邊界）── */
   const geoms = [];
-  ORG_LINKS.map(routeLinkF).forEach(function (lk) {
+  links.forEach(function (lk) {
     const a = nm[lk.from], b = nm[lk.to];
     if (!a || !b) { geoms.push(null); return; }
     const g = linkGeom(a, b, lk.bend || 0);
@@ -8229,42 +8353,59 @@ function renderRoutesSVG() {
     svg.appendChild(p);
   });
 
-  /* ── 試劑標籤（自動避讓節點與其他標籤）── */
-  ORG_LINKS.map(routeLinkF).forEach(function (lk, li) {
+  /* ── 試劑標籤（自動避讓節點與其他標籤）──
+     兩階段：先全部初排，再對仍有重疊的標籤做數輪位移修正 */
+  /* 避讓時在標籤外框外加一圈安全間距，視覺上才不會貼著節點 */
+  const PAD = 8;
+  const ovlArea = function (a, c) {
+    const A = { x: a.x - PAD, y: a.y - PAD, w: a.w + PAD * 2, h: a.h + PAD * 2 };
+    const w = Math.min(A.x + A.w, c.x + c.w) - Math.max(A.x, c.x);
+    const h = Math.min(A.y + A.h, c.y + c.h) - Math.max(A.y, c.y);
+    return (w > 0 && h > 0) ? w * h : 0;
+  };
+  const tagBoxes = [];   // 與 links 同索引
+  const tagMeta = [];
+
+  links.forEach(function (lk, li) {
     const g = geoms[li];
-    if (!g) return;
-    const col = EDGE_COLOR[lk.kind] || '#64748b';
+    if (!g) { tagBoxes.push(null); tagMeta.push(null); return; }
     const lines = [lk.label].concat(lk.reagents || []);
     const fs = 12, lh = 15;
     let maxW = 0;
-    lines.forEach(function (s) { maxW = Math.max(maxW, textW(s, fs)); });
+    lines.forEach(function (s, si) { maxW = Math.max(maxW, measureW(s, fs, si === 0)); });
     const bw = maxW + 14, bh = lines.length * lh + 8;
 
     const ts = [];
     if (lk.lt != null) ts.push(lk.lt);
-    [0.5, 0.42, 0.58, 0.34, 0.66, 0.26, 0.74, 0.18, 0.82,
-     0.62, 0.38, 0.70, 0.30, 0.14, 0.86].forEach(function (v) {
-      if (ts.indexOf(v) < 0) ts.push(v);
-    });
-    const offs = [];
-    for (let v = 0; v <= 165; v += 11) { if (v === 0) offs.push(0); else { offs.push(-v); offs.push(v); } }
+    /* 沿曲線密集取樣 + 大幅度垂直偏移，給避讓演算法足夠的候選位置 */
+    for (let v = 0.5; v <= 0.94; v += 0.04) ts.push(v);
+    for (let v = 0.46; v >= 0.06; v -= 0.04) ts.push(v);
+    tagMeta.push({ lines: lines, bw: bw, bh: bh, ts: ts, g: g, lk: lk });
+    tagBoxes.push(null);
+  });
+
+  /* 為第 li 個標籤在目前 placed 狀況下找最佳位置；exclude 為暫時忽略的索引 */
+  const placeTag = function (li, exclude, maxOff) {
+    const m = tagMeta[li];
+    if (!m) return null;
+    const g = m.g, bw = m.bw, bh = m.bh;
     let best = null, bestScore = Infinity;
-    const area = function (a, c) {
-      const w = Math.min(a.x + a.w, c.x + c.w) - Math.max(a.x, c.x);
-      const h = Math.min(a.y + a.h, c.y + c.h) - Math.max(a.y, c.y);
-      return (w > 0 && h > 0) ? w * h : 0;
-    };
-    for (let i = 0; i < ts.length && !best; i++) {
-      const t = g.s0 + (g.s1 - g.s0) * ts[i];
+    const offs = [];
+    for (let v = 0; v <= maxOff; v += 8) { if (v === 0) offs.push(0); else { offs.push(-v); offs.push(v); } }
+    for (let i = 0; i < m.ts.length && !best; i++) {
+      const t = g.s0 + (g.s1 - g.s0) * m.ts[i];
       const pt = bezPt(g.full[0], g.full[1], g.full[2], t);
       const tan = bezTan(g.full[0], g.full[1], g.full[2], t);
       for (let k = 0; k < offs.length; k++) {
         const bx = { x: pt.x - tan.y * offs[k] - bw / 2, y: pt.y + tan.x * offs[k] - bh / 2, w: bw, h: bh };
-        if (bx.x < 64 || bx.y < 64 || bx.x + bw > 1272 || bx.y + bh > 776) continue;
+        if (bx.x < 60 || bx.y < 60 || bx.x + bw > 1348 || bx.y + bh > 858) continue;
         let sc = 0;
-        for (let q = 0; q < placed.length; q++) sc += area(bx, placed[q]);
+        for (let q = 0; q < placed.length; q++) {
+          if (q === exclude) continue;
+          sc += ovlArea(bx, placed[q]);
+        }
         /* 離曲線越遠扣分越多，優先貼近連線 */
-        sc += Math.abs(offs[k]) * 1.2 + Math.abs(ts[i] - 0.5) * 260;
+        sc += Math.abs(offs[k]) * 1.2 + Math.abs(m.ts[i] - 0.5) * 260;
         if (sc === 0) { best = bx; break; }
         if (sc < bestScore) { bestScore = sc; best = bx; }
       }
@@ -8274,7 +8415,69 @@ function renderRoutesSVG() {
       const pt = bezPt(g.full[0], g.full[1], g.full[2], t);
       best = { x: pt.x - bw / 2, y: pt.y - bh / 2, w: bw, h: bh };
     }
-    placed.push(best);
+    /* 兜底：以目前位置為中心向外螺旋推出，直到完全不重疊 */
+    let sc = 0;
+    for (let q = 0; q < placed.length; q++) { if (q === exclude) continue; sc += ovlArea(best, placed[q]); }
+    if (sc > 0) {
+      const dirs = [];
+      for (let a = 0; a < 16; a++) {
+        const th = a * Math.PI / 8;
+        dirs.push([Math.cos(th), Math.sin(th)]);
+      }
+      outer:
+      for (let step = 14; step <= 320; step += 14) {
+        for (let d = 0; d < dirs.length; d++) {
+          const cand = { x: best.x + dirs[d][0] * step, y: best.y + dirs[d][1] * step, w: bw, h: bh };
+          if (cand.x < 60 || cand.y < 60 || cand.x + bw > 1348 || cand.y + bh > 858) continue;
+          let s2 = 0;
+          for (let q = 0; q < placed.length; q++) { if (q === exclude) continue; s2 += ovlArea(cand, placed[q]); }
+          if (s2 === 0) { best = cand; break outer; }
+        }
+      }
+    }
+    return best;
+  };
+
+  /* 第一階段：依序初排 */
+  links.forEach(function (lk, li) {
+    if (!tagMeta[li]) return;
+    const bx = placeTag(li, -1, 240);
+    tagBoxes[li] = bx;
+    placed.push(bx);
+  });
+
+  /* 第二階段：對仍有重疊的標籤做數輪重排（暫時把自己從 placed 移除） */
+  const nodeN = nodeBoxes.length;
+  for (let round = 0; round < 4; round++) {
+    let moved = false;
+    for (let li = 0; li < tagBoxes.length; li++) {
+      const bx = tagBoxes[li];
+      if (!bx) continue;
+      let sc = 0;
+      for (let q = 0; q < placed.length; q++) {
+        if (placed[q] === bx) continue;
+        sc += ovlArea(bx, placed[q]);
+      }
+      if (sc <= 0) continue;              // 沒重疊，跳過
+      const idx = placed.indexOf(bx);
+      if (idx >= 0) placed.splice(idx, 1);
+      const nb = placeTag(li, -1, 240 + round * 80);
+      placed.push(nb);
+      tagBoxes[li] = nb;
+      moved = true;
+    }
+    if (!moved) break;
+  }
+
+  /* ── 繪製 ── */
+  links.forEach(function (lk, li) {
+    const g = geoms[li];
+    if (!g) return;
+    const col = EDGE_COLOR[lk.kind] || '#64748b';
+    const m = tagMeta[li];
+    const lh = 15;
+    const lines = m.lines, bw = m.bw, bh = m.bh;
+    const best = tagBoxes[li];
 
     const bg = document.createElementNS(NS, 'rect');
     bg.setAttribute('x', best.x.toFixed(1)); bg.setAttribute('y', best.y.toFixed(1));
@@ -8319,18 +8522,21 @@ function renderRoutesSVG() {
 
   /* ── 節點（黃色方框，醇為中心加大） ── */
   ORG_NODES.map(routeNodeF).forEach(function (n) {
-    const cw = n.center ? 176 : 152;
-    const ch = n.center ? 64 : 54;
+    const sz = nodeSize(n);
+    const cw = sz.w, ch = sz.h;
+    const sel = state.routeNode === n.id;
+    const dim = focus && !nearNodes[n.id];
+    const active = !dim && (sel || n.center || (focus && nearNodes[n.id]));
     const g = document.createElementNS(NS, 'g');
-    g.setAttribute('class', 'r-node');
+    g.setAttribute('class', 'r-node' + (dim ? ' dim' : ''));
 
     const r = document.createElementNS(NS, 'rect');
     r.setAttribute('x', n.x - cw / 2); r.setAttribute('y', n.y - ch / 2);
     r.setAttribute('width', cw); r.setAttribute('height', ch);
     r.setAttribute('rx', 10);
-    r.setAttribute('fill', n.center ? '#fde68a' : '#fefce8');
-    r.setAttribute('stroke', state.routeNode === n.id ? '#d97706' : '#facc15');
-    r.setAttribute('stroke-width', n.center ? 2.5 : (state.routeNode === n.id ? 2.5 : 1.5));
+    r.setAttribute('fill', n.center ? '#fde68a' : (active ? '#fefce8' : '#f8fafb'));
+    r.setAttribute('stroke', sel ? '#d97706' : (active ? '#facc15' : '#e2e8f0'));
+    r.setAttribute('stroke-width', n.center ? 2.5 : (sel ? 2.5 : 1.5));
     g.appendChild(r);
 
     if (n.center) {
@@ -8345,6 +8551,7 @@ function renderRoutesSVG() {
     t1.setAttribute('x', n.x); t1.setAttribute('y', n.y - (n.center ? 3 : 2));
     t1.setAttribute('class', 'r-label'); t1.setAttribute('text-anchor', 'middle');
     if (n.center) t1.setAttribute('style', 'font-size:16px');
+    if (dim) t1.setAttribute('opacity', '0.35');
     t1.textContent = n.label;
     g.appendChild(t1);
 
@@ -8352,15 +8559,81 @@ function renderRoutesSVG() {
     t2.setAttribute('x', n.x); t2.setAttribute('y', n.y + (n.center ? 18 : 16));
     t2.setAttribute('class', 'r-sub'); t2.setAttribute('text-anchor', 'middle');
     if (n.center) t2.setAttribute('style', 'font-size:12px');
+    if (dim) t2.setAttribute('opacity', '0.3');
     t2.textContent = n.sub;
     g.appendChild(t2);
 
-    g.onclick = function () { state.routeNode = n.id; renderRoutesSVG(); renderRouteDetail(); };
+    /* 焦點模式下，在節點右上角顯示「只看此處 / 取消」提示圈 */
+    if (focus === n.id) {
+      const bx = n.x + cw / 2 - 9, by = n.y - ch / 2 + 9;
+      const cc = document.createElementNS(NS, 'circle');
+      cc.setAttribute('cx', bx); cc.setAttribute('cy', by);
+      cc.setAttribute('r', '7.5');
+      cc.setAttribute('fill', '#d97706');
+      g.appendChild(cc);
+      const xx = document.createElementNS(NS, 'text');
+      xx.setAttribute('x', bx); xx.setAttribute('y', by + 3.6);
+      xx.setAttribute('class', 'r-dot'); xx.setAttribute('text-anchor', 'middle');
+      xx.textContent = '✕';
+      g.appendChild(xx);
+    }
+
+    g.onclick = function () {
+      /* 再點一次已聚焦的節點 → 取消聚焦 */
+      state.routeFocus = (state.routeFocus === n.id) ? null : n.id;
+      state.routeNode = n.id;
+      renderRoutesSVG(); renderRouteFocusBar(); renderRouteDetail();
+    };
     svg.appendChild(g);
   });
 
   area.appendChild(svg);
 }
+/* 圖層切換 chips */
+function renderRouteLayers() {
+  const box = $('routeLayers');
+  if (!box) return;
+  box.innerHTML = '';
+  ROUTE_LAYERS.forEach(function (L2) {
+    const n = (ORG_LINKS.filter(function (lk) { return L2.id === 'all' || lk.g === L2.id; })).length;
+    const b = el('button', 'chip' + (state.routeLayer === L2.id ? ' on' : ''),
+      L2.ic + ' ' + L(L2.t, L2.en));
+    b.title = L(L2.s, L2.en_s) + '　·　' + n + ' 條';
+    b.onclick = function () {
+      state.routeLayer = L2.id;
+      renderRouteLayers(); renderRoutesSVG(); renderRouteFocusBar();
+    };
+    box.appendChild(b);
+  });
+}
+
+/* 焦點提示列：顯示正在看哪個官能團，可一鍵回到全圖 */
+function renderRouteFocusBar() {
+  const box = $('routeFocusBar');
+  if (!box) return;
+  box.innerHTML = '';
+  const f = state.routeFocus;
+  const nd = f ? ORG_NODES.map(routeNodeF).filter(function (n) { return n.id === f; })[0] : null;
+  const cnt = f ? ORG_LINKS.filter(function (lk) { return lk.from === f || lk.to === f; }).length : 0;
+
+  const wrap = el('div', 'hint' + (f ? ' g' : ''));
+  wrap.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;align-items:center';
+  if (f && nd) {
+    wrap.appendChild(el('b', null, '🔍 ' + L('只看 ', 'Focus: ') + nd.label));
+    wrap.appendChild(document.createTextNode(LANG === 'en'
+      ? ('　' + cnt + ' related conversions; tap the node again to cancel.')
+      : ('　共 ' + cnt + ' 條相關轉化；再點一次該節點可取消。')));
+    const cl = el('button', 'btn light sm', L('✕ 回到全圖', '✕ Show all'));
+    cl.onclick = function () { state.routeFocus = null; renderRoutesSVG(); renderRouteFocusBar(); };
+    wrap.appendChild(cl);
+  } else {
+    wrap.appendChild(document.createTextNode(L(
+      '💡 圖太擠？點上方圖層只看某一類反應，或點任一節點只看它的相關反應。',
+      '💡 Too crowded? Use the layers above to view one reaction type, or tap a node to see only its reactions.')));
+  }
+  box.appendChild(wrap);
+}
+
 function renderRouteLegend() {
   const box = $('routeLegend');
   box.innerHTML = '';
@@ -8833,6 +9106,8 @@ function renderAll() {
   renderCpdCats();
   renderCompounds('');
   renderRoutesSVG();
+  renderRouteLayers();
+  renderRouteFocusBar();
   renderRouteLegend();
   renderRouteDetail();
   renderRouteCards();
