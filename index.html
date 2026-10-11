@@ -816,6 +816,57 @@ footer{
   .card,.feat,.kgrp,.qcard{box-shadow:none;border:1px solid #ddd}
 }
 
+/* ══════════ 溶解度表 ══════════ */
+.sol-box{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--bd);
+  border-radius:12px;background:var(--card);box-shadow:var(--sh);margin-top:12px}
+.sol-tbl{border-collapse:separate;border-spacing:0;width:100%;min-width:720px;font-size:13.5px}
+.sol-tbl th,.sol-tbl td{padding:0;text-align:center}
+.sol-corner{min-width:104px;padding:9px 8px!important;font-size:11.5px;font-weight:800;
+  color:var(--mu);background:var(--bg);border-right:1px solid var(--bd);
+  border-bottom:1px solid var(--bd);position:sticky;left:0;z-index:3}
+.sol-ah{min-width:74px;padding:9px 4px!important;font-size:12.5px;font-weight:800;color:#374151;
+  background:var(--bg);border-bottom:1px solid var(--bd);cursor:pointer;transition:.15s;white-space:nowrap}
+.sol-ah:hover{background:#e8eef5}
+.sol-ah.on{background:#cffafe;color:#0e7490;box-shadow:inset 0 -3px 0 #0891b2}
+.sol-ch{min-width:104px;padding:9px 4px!important;font-size:12.5px;font-weight:800;color:#374151;
+  background:var(--bg);border-right:1px solid var(--bd);cursor:pointer;transition:.15s;
+  position:sticky;left:0;z-index:2;white-space:nowrap}
+.sol-ch:hover{background:#e8eef5}
+.sol-ch.on{background:#cffafe;color:#0e7490;box-shadow:inset -3px 0 0 #0891b2}
+.sol-td{padding:8px 4px!important;font-size:12.5px;font-weight:800;cursor:pointer;
+  border-bottom:1px solid #eef1f5;border-right:1px solid #f3f5f8;transition:.14s}
+.sol-td:hover{outline:2px solid var(--pr);outline-offset:-2px;position:relative;z-index:4}
+/* 溶解性配色：綠 S／粉 I／黃 Sl／灰 — */
+.sol-s{background:#ecfdf5;color:#047857}
+.sol-i{background:#fff1f2;color:#be123c}
+.sol-sl{background:#fffbeb;color:#b45309}
+.sol-na{background:#f1f5f9;color:#94a3b8}
+/* 高亮與淡化 */
+.sol-td.hl{box-shadow:inset 0 0 0 2px #0891b2;position:relative;z-index:1}
+.sol-td.fade{opacity:.28}
+.sol-td.match{box-shadow:inset 0 0 0 2px #f59e0b}
+/* 圖例 */
+.sol-lg{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--mu)}
+.sol-lg i{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:20px;
+  padding:0 5px;border-radius:6px;font-size:11.5px;font-weight:800;font-style:normal;border:1px solid}
+.sol-lg.sol-s i{background:#ecfdf5;color:#047857;border-color:#a7f3d0}
+.sol-lg.sol-i i{background:#fff1f2;color:#be123c;border-color:#fecdd3}
+.sol-lg.sol-sl i{background:#fffbeb;color:#b45309;border-color:#fde68a}
+.sol-lg.sol-na i{background:#f1f5f9;color:#94a3b8;border-color:#e2e8f0}
+/* 沉澱色卡 */
+.sol-ppt{display:flex;flex-direction:column;gap:6px}
+.sol-ppt-top{display:flex;align-items:center;gap:9px}
+.sol-ppt-top .swatch{width:22px;height:22px;border-radius:6px;border:1px solid var(--bd);flex:none}
+.sol-ppt-top b{font-size:14.5px;font-weight:800}
+.sol-ppt-c{font-size:13px;font-weight:700;color:#0e7490}
+.sol-ppt-u{font-size:12.5px;color:var(--mu);line-height:1.55}
+@media(max-width:640px){
+  .sol-tbl{min-width:640px;font-size:12.5px}
+  .sol-corner,.sol-ch{min-width:82px}
+  .sol-ah{min-width:64px}
+  .sol-td{padding:7px 3px!important;font-size:11.5px}
+}
+
 </style>
 </head>
 <body>
@@ -1044,6 +1095,32 @@ footer{
         <input id="cpdSearch" type="search" placeholder="搜尋（例：AgCl、藍色、石灰水、酯）">
       </div>
       <div id="cpdArea"></div>
+    </section>
+
+    <!-- ───── 溶解度表 ───── -->
+    <section class="pane" id="pane-sol">
+      <div class="sect" style="margin-top:20px">
+        <h2>溶解度表</h2>
+        <div class="d">陽離子 × 陰離子的溶解性對照，點擊任一格查看該物質的顏色、用途與備註。</div>
+      </div>
+      <div class="hint b">💡 <b>點擊表頭</b>可高亮整行或整列；<b>點擊儲存格</b>看該物質詳情。判斷沉澱、寫離子方程式的必備工具。</div>
+      <div id="solLegend" class="legend" style="margin-top:12px"></div>
+      <div class="searchbox" style="max-width:none">
+        <span class="ic">🔍</span>
+        <input id="solSearch" type="search" placeholder="搜尋離子或物質（例：AgCl、硫酸鋇、Ba²⁺、OH⁻）">
+      </div>
+      <div id="solFocusBar" style="margin-top:10px"></div>
+      <div class="sol-box"><div id="solTable"></div></div>
+      <div class="sect" style="margin-top:26px">
+        <h2>溶解度規則速記</h2>
+        <div class="d">DSE 必背的六條判斷規則。</div>
+      </div>
+      <div id="solRules"></div>
+      <div class="sect" style="margin-top:26px">
+        <h2>常考沉澱顏色</h2>
+        <div class="d">實驗題觀察題直接得分 —— 顏色寫錯就扣分。</div>
+      </div>
+      <div id="solPpt"></div>
     </section>
 
     <!-- ───── 有機轉化圖 ───── -->
@@ -3578,7 +3655,7 @@ const EQUATIONS = [
   { cat: 'energy', name: '乙醇燃燒', eq: 'C₂H₅OH(l) + 3O₂(g) → 2CO₂(g) + 3H₂O(l)', note: '酒精燈與酒精燃料' },
   { cat: 'energy', name: '碳完全燃燒', eq: 'C(s) + O₂(g) → CO₂(g)　ΔH = −394 kJ mol⁻¹', note: '赫斯定律計算的常用數據' },
   { cat: 'energy', name: '一氧化碳燃燒', eq: 'CO(g) + ½O₂(g) → CO₂(g)　ΔH = −283 kJ mol⁻¹', note: '與上式合用可求 C → CO 的 ΔH' },
-  { cat: 'energy', name: '哈伯法製氨', eq: 'N₂(g) + 3H₂(g) ⇌ 2NH₃(g)　ΔH = −92 kJ mol⁻¹', note: '放熱、氣體摩爾數減少 → 高壓低溫有利產率' },
+  { cat: 'energy', name: '哈伯法製氨（能量與平衡）', eq: 'N₂(g) + 3H₂(g) ⇌ 2NH₃(g)　ΔH = −92 kJ mol⁻¹', note: '放熱、氣體摩爾數減少 → 高壓低溫有利產率' },
   { cat: 'energy', name: '接觸法：二氧化硫氧化', eq: '2SO₂(g) + O₂(g) ⇌ 2SO₃(g)　ΔH < 0', note: 'V₂O₅ 催化、約 450 °C、1–2 atm' },
   { cat: 'energy', name: '光合作用（總反應）', eq: '6CO₂(g) + 6H₂O(l) → C₆H₁₂O₆(aq) + 6O₂(g)', note: '吸熱反應，需光能與葉綠素' },
   { cat: 'energy', name: '呼吸作用（總反應）', eq: 'C₆H₁₂O₆(aq) + 6O₂(g) → 6CO₂(g) + 6H₂O(l)', note: '放熱，生物體的能量來源' },
@@ -3609,7 +3686,7 @@ const EQUATIONS = [
   { cat: 'industry', name: '接觸法：燃硫', eq: 'S(s) + O₂(g) → SO₂(g)', note: '接觸法第一步' },
   { cat: 'industry', name: '接觸法：催化氧化', eq: '2SO₂(g) + O₂(g) ⇌ 2SO₃(g)', note: 'V₂O₅ 催化劑、450 °C、常壓、轉化率約 98%' },
   { cat: 'industry', name: '接觸法：吸收', eq: 'SO₃(g) + H₂SO₄(l) → H₂SO₇(l)（發煙硫酸）', note: 'SO₃ 先溶於濃硫酸，再加水稀釋' },
-  { cat: 'industry', name: '哈伯法製氨', eq: 'N₂(g) + 3H₂(g) ⇌ 2NH₃(g)', note: 'Fe 催化、450 °C、200 atm、循環未反應氣體' },
+  { cat: 'industry', name: '哈伯法製氨（工業條件）', eq: 'N₂(g) + 3H₂(g) ⇌ 2NH₃(g)', note: 'Fe 催化、450 °C、200 atm、循環未反應氣體' },
   { cat: 'industry', name: '石灰石在高爐中分解', eq: 'CaCO₃(s) → CaO(s) + CO₂(g)', note: '生成的 CaO 與 SiO₂ 反應成爐渣 CaSiO₃' },
   { cat: 'industry', name: '爐渣生成', eq: 'CaO(s) + SiO₂(s) → CaSiO₃(l)', note: '除去鐵礦中的砂質雜質' },
   { cat: 'industry', name: '二氧化碳生成（高爐）', eq: 'C(s) + O₂(g) → CO₂(g)　｜　CO₂ + C → 2CO', note: 'CO 是真正的還原劑' },
@@ -3642,6 +3719,220 @@ const EQUATION_CATS = [
   { id: 'organic', label: '有機反應', icon: '⌬' },
   { id: 'industry', label: '工業流程', icon: '🏭' },
   { id: 'test', label: '離子與氣體檢驗', icon: '🔬' }
+];
+
+</script>
+<script>
+/* ============================================================
+   溶解度表（陽離子 × 陰離子）
+   code：S 可溶（綠）／I 不溶（粉）／Sl 微溶（黃）／- 不存在或完全水解（灰）
+   每格：[code, 化學式, 顏色外觀, 備註（可省略）]
+   ============================================================ */
+
+const SOL_ANIONS = [
+  { id: 'no3', name: 'NO₃⁻'  },
+  { id: 'cl',  name: 'Cl⁻'   },
+  { id: 'br',  name: 'Br⁻'   },
+  { id: 'i',   name: 'I⁻'    },
+  { id: 'so4', name: 'SO₄²⁻' },
+  { id: 'co3', name: 'CO₃²⁻' },
+  { id: 'oh',  name: 'OH⁻'   },
+  { id: 's',   name: 'S²⁻'   }
+];
+
+const SOL_CATIONS = [
+  { id: 'na', name: 'Na⁺', rows: [
+    ['S','NaNO₃','無色溶液'],
+    ['S','NaCl','無色溶液'],
+    ['S','NaBr','無色溶液'],
+    ['S','NaI','無色溶液'],
+    ['S','Na₂SO₄','無色溶液'],
+    ['S','Na₂CO₃','無色溶液'],
+    ['S','NaOH','無色溶液'],
+    ['S','Na₂S','無色溶液']
+  ]},
+  { id: 'k', name: 'K⁺', rows: [
+    ['S','KNO₃','無色溶液'],
+    ['S','KCl','無色溶液'],
+    ['S','KBr','無色溶液'],
+    ['S','KI','無色溶液'],
+    ['S','K₂SO₄','無色溶液'],
+    ['S','K₂CO₃','無色溶液'],
+    ['S','KOH','無色溶液'],
+    ['S','K₂S','無色溶液']
+  ]},
+  { id: 'nh4', name: 'NH₄⁺', rows: [
+    ['S','NH₄NO₃','無色溶液'],
+    ['S','NH₄Cl','無色溶液'],
+    ['S','NH₄Br','無色溶液'],
+    ['S','NH₄I','無色溶液'],
+    ['S','(NH₄)₂SO₄','無色溶液'],
+    ['S','(NH₄)₂CO₃','無色溶液'],
+    ['S','NH₃(aq)','無色溶液','氨水：弱鹼，加熱逸出 NH₃'],
+    ['S','(NH₄)₂S','無色溶液']
+  ]},
+  { id: 'mg', name: 'Mg²⁺', rows: [
+    ['S','Mg(NO₃)₂','無色溶液'],
+    ['S','MgCl₂','無色溶液'],
+    ['S','MgBr₂','無色溶液'],
+    ['S','MgI₂','無色溶液'],
+    ['S','MgSO₄','無色溶液'],
+    ['I','MgCO₃','白色沉澱'],
+    ['I','Mg(OH)₂','白色沉澱'],
+    ['-','—','—','MgS 在水中完全水解']
+  ]},
+  { id: 'ca', name: 'Ca²⁺', rows: [
+    ['S','Ca(NO₃)₂','無色溶液'],
+    ['S','CaCl₂','無色溶液'],
+    ['S','CaBr₂','無色溶液'],
+    ['S','CaI₂','無色溶液'],
+    ['Sl','CaSO₄','白色微溶','微溶；石灰水成分之一'],
+    ['I','CaCO₃','白色沉澱','石灰水渾濁＝CO₂ 檢驗'],
+    ['Sl','Ca(OH)₂','微溶（石灰水）','溶於水呈鹼性，通 CO₂ 變渾濁'],
+    ['Sl','CaS','微溶','在水中部份水解']
+  ]},
+  { id: 'ba', name: 'Ba²⁺', rows: [
+    ['S','Ba(NO₃)₂','無色溶液'],
+    ['S','BaCl₂','無色溶液'],
+    ['S','BaBr₂','無色溶液'],
+    ['S','BaI₂','無色溶液'],
+    ['I','BaSO₄','白色沉澱','不溶於稀酸；SO₄²⁻ 檢驗'],
+    ['I','BaCO₃','白色沉澱','溶於稀酸並放出 CO₂'],
+    ['S','Ba(OH)₂','無色溶液','強鹼；可吸收 CO₂'],
+    ['S','BaS','無色溶液']
+  ]},
+  { id: 'ag', name: 'Ag⁺', rows: [
+    ['S','AgNO₃','無色溶液'],
+    ['I','AgCl','白色沉澱','Cl⁻ 檢驗；光照變灰紫'],
+    ['I','AgBr','奶黃色沉澱','Br⁻ 檢驗'],
+    ['I','AgI','黃色沉澱','I⁻ 檢驗'],
+    ['Sl','Ag₂SO₄','白色微溶'],
+    ['I','Ag₂CO₃','淡黃色沉澱'],
+    ['-','Ag₂O','棕黑色沉澱','AgOH 不穩定，生成棕黑 Ag₂O'],
+    ['I','Ag₂S','黑色沉澱']
+  ]},
+  { id: 'cu', name: 'Cu²⁺', rows: [
+    ['S','Cu(NO₃)₂','藍色溶液'],
+    ['S','CuCl₂','藍綠色溶液'],
+    ['S','CuBr₂','綠色溶液'],
+    ['I','CuI','白色沉澱','Cu²⁺ 氧化 I⁻ 生成 I₂ + CuI'],
+    ['S','CuSO₄','藍色溶液','膽礬；Cu²⁺ 代表溶液'],
+    ['I','CuCO₃','藍綠色沉澱'],
+    ['I','Cu(OH)₂','藍色膠狀沉澱','Cu²⁺ 檢驗；溶於過量氨水成深藍'],
+    ['I','CuS','黑色沉澱']
+  ]},
+  { id: 'fe2', name: 'Fe²⁺', rows: [
+    ['S','Fe(NO₃)₂','淺綠色溶液'],
+    ['S','FeCl₂','淺綠色溶液'],
+    ['S','FeBr₂','淺綠色溶液'],
+    ['S','FeI₂','淺綠色溶液'],
+    ['S','FeSO₄','淺綠色溶液'],
+    ['I','FeCO₃','灰綠色沉澱'],
+    ['I','Fe(OH)₂','綠色沉澱','迅速氧化成紅棕 Fe(OH)₃'],
+    ['I','FeS','黑色沉澱']
+  ]},
+  { id: 'fe3', name: 'Fe³⁺', rows: [
+    ['S','Fe(NO₃)₃','黃棕色溶液'],
+    ['S','FeCl₃','黃棕色溶液'],
+    ['S','FeBr₃','黃棕色溶液'],
+    ['-','—','—','Fe³⁺ 氧化 I⁻ 生成 I₂，非沉澱反應'],
+    ['S','Fe₂(SO₄)₃','黃棕色溶液'],
+    ['-','—','—','Fe³⁺ 碳酸鹽完全水解'],
+    ['I','Fe(OH)₃','紅棕色膠狀沉澱','Fe³⁺ 檢驗'],
+    ['-','—','—','Fe³⁺ 氧化 S²⁻ 生成 S']
+  ]},
+  { id: 'al', name: 'Al³⁺', rows: [
+    ['S','Al(NO₃)₃','無色溶液'],
+    ['S','AlCl₃','無色溶液'],
+    ['S','AlBr₃','無色溶液'],
+    ['S','AlI₃','無色溶液'],
+    ['S','Al₂(SO₄)₃','無色溶液'],
+    ['-','—','—','Al³⁺ 碳酸鹽完全水解'],
+    ['I','Al(OH)₃','白色膠狀沉澱','兩性：溶於過量 NaOH'],
+    ['-','—','—','Al³⁺ 硫化物完全水解']
+  ]},
+  { id: 'pb', name: 'Pb²⁺', rows: [
+    ['S','Pb(NO₃)₂','無色溶液'],
+    ['Sl','PbCl₂','白色微溶','溶於熱水，冷卻再結晶'],
+    ['Sl','PbBr₂','白色微溶','溶於熱水'],
+    ['I','PbI₂','黃色沉澱','Pb²⁺ 檢驗；加熱溶解冷卻析金黃片'],
+    ['I','PbSO₄','白色沉澱'],
+    ['I','PbCO₃','白色沉澱'],
+    ['I','Pb(OH)₂','白色沉澱','兩性：溶於過量 NaOH'],
+    ['I','PbS','黑色沉澱']
+  ]},
+  { id: 'zn', name: 'Zn²⁺', rows: [
+    ['S','Zn(NO₃)₂','無色溶液'],
+    ['S','ZnCl₂','無色溶液'],
+    ['S','ZnBr₂','無色溶液'],
+    ['S','ZnI₂','無色溶液'],
+    ['S','ZnSO₄','無色溶液'],
+    ['I','ZnCO₃','白色沉澱'],
+    ['I','Zn(OH)₂','白色沉澱','兩性：溶於過量 NaOH 與氨水'],
+    ['I','ZnS','白色沉澱']
+  ]}
+];
+
+/* 溶解性代碼說明 */
+const SOL_CODES = [
+  { id: 'S',  name: 'S',  zh: '可溶',   en: 'Soluble',      desc: '溶於水（一般 > 0.1 mol dm⁻³）' },
+  { id: 'I',  name: 'I',  zh: '不溶',   en: 'Insoluble',    desc: '不溶於水，生成沉澱' },
+  { id: 'Sl', name: 'Sl', zh: '微溶',   en: 'Slightly',     desc: '微溶／難溶，少量溶解' },
+  { id: '-',  name: '—',  zh: '不存在', en: 'N/A',          desc: '不存在，或在水中完全水解／氧化還原' }
+];
+
+/* 溶解度規則速記（DSE 必背） */
+const SOL_RULES = [
+  { t: '全部可溶組',
+    en: 'Always soluble',
+    d: '所有 Na⁺、K⁺、NH₄⁺ 的鹽都可溶；所有硝酸鹽 NO₃⁻ 都可溶。',
+    d2: 'All salts of Na⁺, K⁺ and NH₄⁺ are soluble; all nitrates (NO₃⁻) are soluble.' },
+  { t: '氯化物／溴化物／碘化物',
+    en: 'Halides (Cl⁻ / Br⁻ / I⁻)',
+    d: '大多數可溶，例外：Ag⁺ 不溶（AgCl 白、AgBr 奶黃、AgI 黃）；Pb²⁺ 微溶（溶於熱水）。',
+    d2: 'Most are soluble. Exceptions: Ag⁺ insoluble (AgCl white, AgBr cream, AgI yellow); Pb²⁺ slightly soluble (dissolves in hot water).' },
+  { t: '硫酸鹽 SO₄²⁻',
+    en: 'Sulfates (SO₄²⁻)',
+    d: '大多數可溶，例外：Ba²⁺、Pb²⁺ 不溶（白色）；Ca²⁺、Ag⁺ 微溶。BaSO₄ 不溶於稀酸，是 SO₄²⁻ 的檢驗。',
+    d2: 'Most are soluble. Exceptions: Ba²⁺ and Pb²⁺ insoluble (white); Ca²⁺ and Ag⁺ slightly soluble. BaSO₄ is insoluble in dilute acid — the test for SO₄²⁻.' },
+  { t: '碳酸鹽 CO₃²⁻',
+    en: 'Carbonates (CO₃²⁻)',
+    d: '除了 Na⁺、K⁺、NH₄⁺ 外全部不溶（白色沉澱）。Fe³⁺、Al³⁺ 的碳酸鹽在水中完全水解，不存在。',
+    d2: 'All insoluble (white precipitate) except those of Na⁺, K⁺ and NH₄⁺. Fe³⁺ and Al³⁺ carbonates hydrolyse completely and do not exist.' },
+  { t: '氫氧化物 OH⁻',
+    en: 'Hydroxides (OH⁻)',
+    d: 'Na⁺、K⁺、NH₄⁺（氨水）、Ba²⁺ 可溶；Ca²⁺ 微溶；其餘不溶。Al(OH)₃、Zn(OH)₂、Pb(OH)₂ 為兩性，溶於過量 NaOH。',
+    d2: 'Na⁺, K⁺, NH₄⁺ (ammonia solution) and Ba²⁺ are soluble; Ca²⁺ slightly soluble; the rest insoluble. Al(OH)₃, Zn(OH)₂ and Pb(OH)₂ are amphoteric — they dissolve in excess NaOH.' },
+  { t: '硫化物 S²⁻',
+    en: 'Sulfides (S²⁻)',
+    d: 'Na⁺、K⁺、NH₄⁺、Ba²⁺ 可溶；Ca²⁺ 微溶；其餘多為黑色或有色沉澱（CuS、PbS、FeS、Ag₂S 黑；ZnS 白）。',
+    d2: 'Na⁺, K⁺, NH₄⁺ and Ba²⁺ are soluble; Ca²⁺ slightly soluble; most others form dark precipitates (CuS, PbS, FeS, Ag₂S black; ZnS white).' }
+];
+
+/* 常考沉澱顏色速查 */
+const SOL_PPT = [
+  { f: 'AgCl',  c: '白色',        use: 'Cl⁻ 檢驗（加 AgNO₃ + 稀 HNO₃）',            k: 'white' },
+  { f: 'AgBr',  c: '奶黃色',      use: 'Br⁻ 檢驗',                                  k: 'cream' },
+  { f: 'AgI',   c: '黃色',        use: 'I⁻ 檢驗',                                   k: 'yellow' },
+  { f: 'BaSO₄', c: '白色',        use: 'SO₄²⁻ 檢驗（不溶於稀酸）',                  k: 'white' },
+  { f: 'CaCO₃', c: '白色',        use: '石灰水渾濁＝CO₂ 檢驗',                      k: 'white' },
+  { f: 'BaCO₃', c: '白色',        use: '溶於稀酸並放出 CO₂',                        k: 'white' },
+  { f: 'Cu(OH)₂', c: '藍色膠狀',  use: 'Cu²⁺ 檢驗；溶於過量氨水成深藍溶液',        k: 'blue' },
+  { f: 'Fe(OH)₂', c: '綠色',      use: '迅速氧化成紅棕色 Fe(OH)₃',                  k: 'green' },
+  { f: 'Fe(OH)₃', c: '紅棕色膠狀', use: 'Fe³⁺ 檢驗',                               k: 'brown' },
+  { f: 'Al(OH)₃', c: '白色膠狀',  use: 'Al³⁺ 檢驗；兩性，溶於過量 NaOH',           k: 'white' },
+  { f: 'Zn(OH)₂', c: '白色',      use: 'Zn²⁺ 檢驗；兩性，溶於過量 NaOH 與氨水',    k: 'white' },
+  { f: 'Pb(OH)₂', c: '白色',      use: 'Pb²⁺ 檢驗；兩性，溶於過量 NaOH',           k: 'white' },
+  { f: 'PbCl₂', c: '白色',        use: 'Pb²⁺ 檢驗；溶於熱水，冷卻再結晶',          k: 'white' },
+  { f: 'PbI₂',  c: '黃色',        use: 'Pb²⁺ 檢驗；加熱溶解冷卻析金黃色片狀',      k: 'yellow' },
+  { f: 'Mg(OH)₂', c: '白色',      use: 'Mg²⁺ 檢驗',                                k: 'white' },
+  { f: 'CuCO₃', c: '藍綠色',      use: 'Cu²⁺ 碳酸鹽',                              k: 'blue' },
+  { f: 'CuS',   c: '黑色',        use: 'S²⁻ 與 Cu²⁺ 生成',                         k: 'black' },
+  { f: 'PbS',   c: '黑色',        use: 'S²⁻ 與 Pb²⁺ 生成',                         k: 'black' },
+  { f: 'FeS',   c: '黑色',        use: 'S²⁻ 與 Fe²⁺ 生成',                         k: 'black' },
+  { f: 'Ag₂S',  c: '黑色',        use: 'S²⁻ 與 Ag⁺ 生成',                          k: 'black' },
+  { f: 'ZnS',   c: '白色',        use: 'S²⁻ 與 Zn²⁺ 生成',                         k: 'white' },
+  { f: 'Ag₂O',  c: '棕黑色',      use: 'Ag⁺ 加 OH⁻ 生成（AgOH 不穩定）',           k: 'brown' }
 ];
 
 </script>
@@ -5424,7 +5715,7 @@ const EN_EQUATION = {
   "乙醇燃燒": {"name": "Combustion of ethanol", "note": "Used in spirit burners and as a fuel"},
   "碳完全燃燒": {"name": "Complete combustion of carbon", "note": "A commonly used value in Hess's law calculations"},
   "一氧化碳燃燒": {"name": "Combustion of carbon monoxide", "note": "Used with the equation above to find delta H for C to CO"},
-  "哈伯法製氨": {"name": "Haber process for ammonia", "note": "Exothermic and the number of moles of gas decreases — high pressure and low temperature favour yield"},
+  "哈伯法製氨（能量與平衡）": {"name": "Haber process for ammonia (energy & equilibrium)", "note": "Exothermic and the number of moles of gas decreases — high pressure and low temperature favour yield"},
   "接觸法：二氧化硫氧化": {"name": "Contact process: oxidation of sulphur dioxide", "note": "V2O5 catalyst, about 450 C, 1-2 atm"},
   "光合作用（總反應）": {"name": "Photosynthesis (overall reaction)", "note": "Endothermic, requiring light energy and chlorophyll"},
   "呼吸作用（總反應）": {"name": "Respiration (overall reaction)", "note": "Exothermic, the source of energy in living organisms"},
@@ -5451,7 +5742,7 @@ const EN_EQUATION = {
   "接觸法：燃硫": {"name": "Contact process: burning sulphur", "note": "The first step of the Contact process"},
   "接觸法：催化氧化": {"name": "Contact process: catalytic oxidation", "note": "V2O5 catalyst, 450 C, atmospheric pressure, about 98% conversion"},
   "接觸法：吸收": {"name": "Contact process: absorption", "note": "SO3 is first dissolved in conc. H2SO4, then diluted with water"},
-  "哈伯法製氨": {"name": "Haber process for ammonia", "note": "Fe catalyst, 450 C, 200 atm, recycling unreacted gases"},
+  "哈伯法製氨（工業條件）": {"name": "Haber process for ammonia (industrial conditions)", "note": "Fe catalyst, 450 C, 200 atm, recycling unreacted gases"},
   "石灰石在高爐中分解": {"name": "Limestone decomposing in a blast furnace", "note": "The CaO formed then reacts with SiO2 to give slag CaSiO3"},
   "爐渣生成": {"name": "Formation of slag", "note": "Removes the sandy impurity from the iron ore"},
   "二氧化碳生成（高爐）": {"name": "Formation of carbon dioxide (blast furnace)", "note": "CO is the actual reducing agent"},
@@ -6003,6 +6294,63 @@ const EN_UI = {
   '沒有符合的元素。': 'No matching elements.',
 
   /* ── 有機轉化圖：圖層與焦點 ── */
+  /* ── 溶解度表 ── */
+  '溶解度表': 'Solubility Table',
+  '陽離子＼陰離子': 'Cation＼Anion',
+  '化學式': 'Formula',
+  '溶解性': 'Solubility',
+  '顏色外觀': 'Appearance',
+  '物質': 'Ions',
+  '備註：': 'Note: ',
+  '離子方程式：': 'Ionic equation: ',
+  '在化合物圖鑑中搜尋': 'Search in Compounds',
+  '溶解度：': 'Solubility: ',
+  '高亮：': 'Highlighting: ',
+  '高亮整列：': 'Highlighting column: ',
+  '高亮整行：': 'Highlighting row: ',
+  '✕ 取消高亮': '✕ Clear',
+  '溶於水（一般 > 0.1 mol dm⁻³）': 'Dissolves in water (generally > 0.1 mol dm⁻³)',
+  '不溶於水，生成沉澱': 'Insoluble in water; forms a precipitate',
+  '微溶／難溶，少量溶解': 'Slightly soluble; only a little dissolves',
+  '不存在，或在水中完全水解／氧化還原': 'Does not exist, or hydrolyses / redox-reacts completely in water',
+  '可溶': 'Soluble',
+  '不溶': 'Insoluble',
+  '微溶': 'Slightly soluble',
+  '不存在': 'Does not exist',
+  '溶解度規則速記': 'Solubility Rules',
+  'DSE 必背的六條判斷規則。': 'Six rules you must know for the DSE.',
+  '常考沉澱顏色': 'Common Precipitate Colours',
+  '實驗題觀察題直接得分 —— 顏色寫錯就扣分。': 'Direct marks in observation questions — a wrong colour costs marks.',
+  '陽離子 × 陰離子對照，點擊看沉澱顏色；含六條規則與常考沉澱色': 'Cation × anion grid; tap for precipitate colours, plus six rules and common test colours',
+  '無色溶液': 'Colourless solution',
+  '藍色溶液': 'Blue solution',
+  '黃棕色溶液': 'Yellow-brown solution',
+  '淺綠色溶液': 'Pale green solution',
+  '藍綠色溶液': 'Blue-green solution',
+  '綠色溶液': 'Green solution',
+  '白色沉澱': 'White precipitate',
+  '黃色沉澱': 'Yellow precipitate',
+  '奶黃色沉澱': 'Cream precipitate',
+  '淡黃色沉澱': 'Pale yellow precipitate',
+  '棕黑色沉澱': 'Brown-black precipitate',
+  '黑色沉澱': 'Black precipitate',
+  '藍色膠狀沉澱': 'Blue gelatinous precipitate',
+  '綠色沉澱': 'Green precipitate',
+  '紅棕色膠狀沉澱': 'Red-brown gelatinous precipitate',
+  '白色膠狀沉澱': 'White gelatinous precipitate',
+  '灰綠色沉澱': 'Grey-green precipitate',
+  '藍綠色沉澱': 'Blue-green precipitate',
+  '白色微溶': 'White, slightly soluble',
+  '微溶（石灰水）': 'Slightly soluble (limewater)',
+  '—': '—',
+  '陽離子 × 陰離子的溶解性對照，點擊任一格查看該物質的顏色、用途與備註。': 'Cation × anion solubility grid. Tap any cell to see its colour, use and notes.',
+  '點擊表頭': 'Tap a header',
+  '點擊儲存格': 'tap a cell',
+  '判斷沉澱、寫離子方程式的必備工具。': 'Essential for predicting precipitates and writing ionic equations.',
+  '💡 ': '💡 ',
+  '可高亮整行或整列；': 'to highlight a row or column; ',
+  '看該': 'see details for the ',
+  '詳情。': '. ',
   /* ── 倒數計時 ── */
   '天後考化學': 'days to Chemistry',
   '今日考化學': 'Chemistry today',
@@ -6092,6 +6440,68 @@ const EN_UI = {
   '化合物': 'Compounds',
   '轉化圖': 'Reaction Map',
   '方程式': 'Equations'
+};
+
+
+/* 溶解度表：沉澱顏色與用途對照 */
+const EN_SOL_TEXT = {
+  "白色": "White",
+  "奶黃色": "Cream",
+  "黃色": "Yellow",
+  "藍色膠狀": "Blue gelatinous",
+  "綠色": "Green",
+  "紅棕色膠狀": "Red-brown gelatinous",
+  "白色膠狀": "White gelatinous",
+  "灰綠色": "Grey-green",
+  "藍綠色": "Blue-green",
+  "棕黑色": "Brown-black",
+  "黑色": "Black",
+  "淡黃色": "Pale yellow",
+  "Cl⁻ 檢驗（加 AgNO₃ + 稀 HNO₃）": "Test for Cl⁻ (add AgNO₃ + dilute HNO₃)",
+  "Br⁻ 檢驗": "Test for Br⁻",
+  "I⁻ 檢驗": "Test for I⁻",
+  "SO₄²⁻ 檢驗（不溶於稀酸）": "Test for SO₄²⁻ (insoluble in dilute acid)",
+  "石灰水渾濁＝CO₂ 檢驗": "Limewater turns milky = test for CO₂",
+  "溶於稀酸並放出 CO₂": "Dissolves in dilute acid, giving off CO₂",
+  "Cu²⁺ 檢驗；溶於過量氨水成深藍溶液": "Test for Cu²⁺; dissolves in excess ammonia to a deep blue solution",
+  "迅速氧化成紅棕色 Fe(OH)₃": "Rapidly oxidised to red-brown Fe(OH)₃",
+  "Fe³⁺ 檢驗": "Test for Fe³⁺",
+  "Al³⁺ 檢驗；兩性，溶於過量 NaOH": "Test for Al³⁺; amphoteric, dissolves in excess NaOH",
+  "Zn²⁺ 檢驗；兩性，溶於過量 NaOH 與氨水": "Test for Zn²⁺; amphoteric, dissolves in excess NaOH and ammonia",
+  "Pb²⁺ 檢驗；兩性，溶於過量 NaOH": "Test for Pb²⁺; amphoteric, dissolves in excess NaOH",
+  "Pb²⁺ 檢驗；溶於熱水，冷卻再結晶": "Test for Pb²⁺; dissolves in hot water, recrystallises on cooling",
+  "Pb²⁺ 檢驗；加熱溶解冷卻析金黃色片狀": "Test for Pb²⁺; dissolves when hot, golden flakes on cooling",
+  "Mg²⁺ 檢驗": "Test for Mg²⁺",
+  "Cu²⁺ 碳酸鹽": "Copper(II) carbonate",
+  "S²⁻ 與 Cu²⁺ 生成": "Formed from S²⁻ and Cu²⁺",
+  "S²⁻ 與 Pb²⁺ 生成": "Formed from S²⁻ and Pb²⁺",
+  "S²⁻ 與 Fe²⁺ 生成": "Formed from S²⁻ and Fe²⁺",
+  "S²⁻ 與 Ag⁺ 生成": "Formed from S²⁻ and Ag⁺",
+  "S²⁻ 與 Zn²⁺ 生成": "Formed from S²⁻ and Zn²⁺",
+  "Ag⁺ 加 OH⁻ 生成（AgOH 不穩定）": "Ag⁺ + OH⁻ (AgOH is unstable)",
+  "氨水：弱鹼，加熱逸出 NH₃": "Ammonia solution: a weak base; NH₃ escapes on heating",
+  "MgS 在水中完全水解": "MgS hydrolyses completely in water",
+  "微溶；石灰水成分之一": "Slightly soluble; a component of limewater",
+  "溶於水呈鹼性，通 CO₂ 變渾濁": "Dissolves to give an alkaline solution; turns milky with CO₂",
+  "在水中部份水解": "Partly hydrolyses in water",
+  "不溶於稀酸；SO₄²⁻ 檢驗": "Insoluble in dilute acid; test for SO₄²⁻",
+  "強鹼；可吸收 CO₂": "A strong base; absorbs CO₂",
+  "Cl⁻ 檢驗；光照變灰紫": "Test for Cl⁻; turns grey-purple in light",
+  "AgOH 不穩定，生成棕黑 Ag₂O": "AgOH is unstable; forms brown-black Ag₂O",
+  "Cu²⁺ 氧化 I⁻ 生成 I₂ + CuI": "Cu²⁺ oxidises I⁻ to I₂, forming CuI",
+  "膽礬；Cu²⁺ 代表溶液": "Blue vitriol; the representative Cu²⁺ solution",
+  "Cu²⁺ 檢驗；溶於過量氨水成深藍": "Test for Cu²⁺; dissolves in excess NH₃ to deep blue",
+  "迅速氧化成紅棕 Fe(OH)₃": "Rapidly oxidised to red-brown Fe(OH)₃",
+  "Fe³⁺ 氧化 I⁻ 生成 I₂，非沉澱反應": "Fe³⁺ oxidises I⁻ to I₂ — not a precipitation reaction",
+  "Fe³⁺ 碳酸鹽完全水解": "Fe³⁺ carbonate hydrolyses completely",
+  "Fe³⁺ 氧化 S²⁻ 生成 S": "Fe³⁺ oxidises S²⁻ to sulfur",
+  "Al³⁺ 碳酸鹽完全水解": "Al³⁺ carbonate hydrolyses completely",
+  "兩性：溶於過量 NaOH": "Amphoteric: dissolves in excess NaOH",
+  "Al³⁺ 硫化物完全水解": "Al³⁺ sulfide hydrolyses completely",
+  "溶於熱水，冷卻再結晶": "Dissolves in hot water; recrystallises on cooling",
+  "溶於熱水": "Dissolves in hot water",
+  "Pb²⁺ 檢驗；加熱溶解冷卻析金黃片": "Test for Pb²⁺; dissolves hot, golden flakes on cooling",
+  "兩性：溶於過量 NaOH 與氨水": "Amphoteric: dissolves in excess NaOH and ammonia"
 };
 
 /* 題型標籤（卷庫 q.k 欄位）*/
@@ -6264,6 +6674,8 @@ const state = {
   routeNode: 'alcohol',
   routeLayer: 'all',
   routeFocus: null,
+  solHlC: null,
+  solHlA: null,
   session: null
 };
 
@@ -6490,6 +6902,7 @@ const MODES = [
   { id: 'graph',   ic: '🕸', t: '知識圖譜',  en: 'Concept Map',      s: '課題關聯 · 點擊跳轉',       s2: 'Topic links · tap to jump' },
   { id: 'ptable',  ic: '🧪', t: '週期表',    en: 'Periodic Table',   s: '118 元素 · 原子模型',       s2: '118 elements · atomic models' },
   { id: 'cpd',     ic: '🎨', t: '化合物',    en: 'Compounds',        s: '顏色 · 用途 · 檢驗',       s2: 'Colour · Uses · Tests' },
+  { id: 'sol',     ic: '💧', t: '溶解度表',  en: 'Solubility',       s: '13 陽離子 × 8 陰離子',     s2: '13 cations × 8 anions' },
   { id: 'routes',  ic: '🔄', t: '轉化圖',    en: 'Reaction Map',     s: '醇為中心 · 標示試劑',       s2: 'Alcohol at centre · reagents labelled' },
   { id: 'eqs',     ic: '⚖️', t: '方程式',    en: 'Equations',        s: '常見反應 · 可搜尋',        s2: 'Common reactions · searchable' },
   { id: 'exam',    ic: '🎯', t: '應試策略',  en: 'Exam Strategy',    s: '架構 · 計算 · 失分位',      s2: 'Structure · Calculations · Pitfalls' },
@@ -6546,6 +6959,7 @@ function go(m) {
   if (m === 'home') renderHome();
   if (m === 'flash') { buildFcQueue(); renderFlash(); }
   if (m === 'wrong') renderWrong();
+  if (m === 'sol') renderSol();
 }
 
 /* ══════════ 倒數計時 ══════════ */
@@ -6620,6 +7034,7 @@ const FEATURES = [
   { m: 'ptable', ic: '🧪', t: '元素週期表', en: 'Periodic Table', d: '118 個元素，點擊看原子模型、電子排布與用途', d2: '118 elements; tap to see atomic models, electron arrangements and uses', fc: '#4f46e5', fcs: '#eef2ff' },
   { m: 'cpd', ic: '🎨', t: '化合物圖鑑', en: 'Compound Guide', d: '顏色、狀態、用途與檢驗方法，實驗題得分關鍵', d2: 'Colour, state, uses and tests — key to experimental questions', fc: '#d97706', fcs: '#fffbeb' },
   { m: 'routes', ic: '🔄', t: '有機轉化圖', en: 'Organic Reaction Map', d: '官能團互換路線圖，附五條常考路線逐步拆解', d2: 'Functional group interconversion map with five common routes', fc: '#7c3aed', fcs: '#f5f3ff' },
+  { m: 'sol', ic: '💧', t: '溶解度表', en: 'Solubility Table', d: '陽離子 × 陰離子對照，點擊看沉澱顏色；含六條規則與常考沉澱色', d2: 'Cation × anion grid; tap for precipitate colours, plus six rules and common test colours', fc: '#0891b2', fcs: '#ecfeff' },
   { m: 'eqs', ic: '⚖️', t: '化學方程式庫', en: 'Equation Bank', d: '常見反應方程式，按課題分類、可搜尋', d2: 'Common equations, grouped by topic and searchable', fc: '#0284c7', fcs: '#f0f9ff' },
   { m: 'ref', ic: '📗', t: '速查手冊', en: 'Quick Reference', d: '離子與氣體檢驗、公式常數、指示劑、光譜數據', d2: 'Ion and gas tests, formulae and constants, indicator colours, spectroscopic data', fc: '#059669', fcs: '#ecfdf5' },
   { m: 'flash', ic: '🃏', t: '記憶閃卡', en: 'Flashcards', d: '翻卡自評，可只溫未掌握的卡片', d2: 'Flip and self-assess; review only unmastered cards', fc: '#e11d48', fcs: '#fff1f2' },
@@ -6643,6 +7058,8 @@ function featMeta(m) {
     case 'exam': return '卷一 60% · 卷二 20% · SBA 20%';
     case 'wrong': return L(state.wrongBook.length + ' 題待重溫 · 可逐題管理',
       state.wrongBook.length + ' to review · manage individually');
+    case 'sol': return L(SOL_CATIONS.length + ' × ' + SOL_ANIONS.length + ' 格 · 含沉澱顏色',
+      SOL_CATIONS.length + ' × ' + SOL_ANIONS.length + ' cells · with precipitate colours');
   }
   return '';
 }
@@ -7147,8 +7564,19 @@ function renderQuestion() {
   tools.appendChild(dl);
   const sa = el('button', 'btn ghost sm', '👁 顯示全部答案');
   sa.onclick = function () {
-    const w = window.open('', '_blank');
-    if (w) { w.document.write(buildPaperHTML(s, true)); w.document.close(); }
+    /* 用 Blob URL 開啟新分頁（較舊的寫法已被標為不建議使用，
+       且在某些瀏覽器會被彈出視窗攔截器擋下） */
+    try {
+      const blob = new Blob([buildPaperHTML(s, true)], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const w = window.open(url, '_blank');
+      if (!w) {   /* 被攔截時退回直接下載 */
+        const a = document.createElement('a');
+        a.href = url; a.target = '_blank'; a.rel = 'noopener';
+        document.body.appendChild(a); a.click(); a.remove();
+      }
+      setTimeout(function () { URL.revokeObjectURL(url); }, 30000);
+    } catch (e) {}
   };
   tools.appendChild(sa);
   card.appendChild(tools);
@@ -7902,7 +8330,10 @@ function renderPTable(filter) {
       const d = el('div', 'el');
       d.style.cssText = 'grid-row:' + m[0] + ';grid-column:' + m[1] + ';background:' +
         CAT_COLOR[m[3]][0] + ';display:flex;flex-direction:column;justify-content:center';
-      d.setAttribute('title', m[2] + ' ' + CAT_COLOR[m[3]][1] + '（點擊篩選此系列）');
+      const seriesEn = m[3] === 'lanth' ? 'Lanthanides' : 'Actinides';
+      d.setAttribute('title', m[2] + ' ' +
+        (LANG === 'en' ? seriesEn : CAT_COLOR[m[3]][1]) +
+        (LANG === 'en' ? '（click to filter this series）' : '（點擊篩選此系列）'));
       const s = el('div', 'sym', m[2]);
       s.style.fontSize = '10px';
       d.appendChild(s);
@@ -8059,7 +8490,9 @@ function openElementModal(e) {
   const asvg = atomSVG(e);
   atom.appendChild(asvg);
   atom.appendChild(el('div', 'atom-cap',
-    '電子繞核運轉示意圖　·　電子層排布：' + e.shells.join('、') + '　（點擊圖可暫停／繼續）'));
+    (LANG === 'en'
+      ? ('Electrons orbiting the nucleus　·　Shell arrangement: ' + e.shells.join(', ') + '　(tap to pause / resume)')
+      : ('電子繞核運轉示意圖　·　電子層排布：' + e.shells.join('、') + '　（點擊圖可暫停／繼續）'))));
   atom.onclick = function () { asvg.classList.toggle('paused'); };
   box.appendChild(atom);
 
@@ -8075,7 +8508,7 @@ function openElementModal(e) {
   box.appendChild(info);
 
   const tip = el('div', 'hint g');
-  tip.appendChild(el('b', null, '性質與用途：'));
+  tip.appendChild(el('b', null, L('性質與用途：', 'Properties and uses: ')));
   tip.appendChild(document.createTextNode(elUse(e)));
   box.appendChild(tip);
 
@@ -8114,6 +8547,260 @@ function renderPtQuick() {
 }
 
 /* ══════════ 化合物 ══════════ */
+/* ══════════ 溶解度表 ══════════ */
+/* 取英文對照，缺譯時回原中文 */
+function solT(zh) {
+  if (LANG !== 'en') return zh;
+  if (typeof EN_SOL_TEXT !== 'undefined' && EN_SOL_TEXT[zh]) return EN_SOL_TEXT[zh];
+  /* 溶液顏色等詞條放在通用介面詞典裡，這裡也要查 */
+  if (typeof EN_UI !== 'undefined' && EN_UI[zh] && EN_UI[zh] !== zh) return EN_UI[zh];
+  return zh;
+}
+function solCodeMeta(code) {
+  return SOL_CODES.filter(function (c) { return c.id === code; })[0] || SOL_CODES[3];
+}
+
+function renderSolLegend() {
+  const box = $('solLegend');
+  if (!box) return;
+  box.innerHTML = '';
+  SOL_CODES.forEach(function (c) {
+    const s = el('span');
+    s.className = 'sol-lg sol-' + (c.id === 'Sl' ? 'sl' : c.id === '-' ? 'na' : c.id.toLowerCase());
+    s.appendChild(el('i', null, c.name));
+    s.appendChild(document.createTextNode(L(c.zh, c.en)));
+    s.title = L(c.desc, (typeof EN_SOL_TEXT!=='undefined'?EN_SOL_TEXT[c.desc]:null) || c.desc);
+    box.appendChild(s);
+  });
+}
+
+function renderSolTable() {
+  const box = $('solTable');
+  if (!box) return;
+  box.innerHTML = '';
+  const kw = norm($('solSearch') ? $('solSearch').value : '');
+  const hlC = state.solHlC, hlA = state.solHlA;
+
+  const tbl = el('table', 'sol-tbl');
+
+  /* ── 表頭 ── */
+  const thead = el('thead');
+  const hr = el('tr');
+  const corner = el('th', 'sol-corner');
+  corner.appendChild(document.createTextNode(L('陽離子＼陰離子', 'Cation＼Anion')));
+  hr.appendChild(corner);
+  SOL_ANIONS.forEach(function (a) {
+    const th = el('th', 'sol-ah' + (hlA === a.id ? ' on' : ''));
+    th.appendChild(document.createTextNode(a.name));
+    th.onclick = function () {
+      state.solHlA = (state.solHlA === a.id) ? null : a.id;
+      renderSolTable(); renderSolFocusBar();
+    };
+    hr.appendChild(th);
+  });
+  thead.appendChild(hr);
+  tbl.appendChild(thead);
+
+  /* ── 表身 ── */
+  const tbody = el('tbody');
+  SOL_CATIONS.forEach(function (cat) {
+    /* 搜尋過濾：只顯示命中該陽離子的列 */
+    const hitRow = new Array(SOL_ANIONS.length).fill(false);
+    let anyHit = false;
+    SOL_ANIONS.forEach(function (a, ai) {
+      const cell = cat.rows[ai];
+      const txt = cat.name + ' ' + cell[1] + ' ' + cell[2] + ' ' + (cell[3] || '');
+      const hit = !kw || norm(txt).indexOf(kw) >= 0;
+      hitRow[ai] = hit;
+      if (hit) anyHit = true;
+    });
+    if (kw && !anyHit) return;
+
+    const tr = el('tr');
+    const th = el('th', 'sol-ch' + (hlC === cat.id ? ' on' : ''));
+    th.appendChild(document.createTextNode(cat.name));
+    th.onclick = function () {
+      state.solHlC = (state.solHlC === cat.id) ? null : cat.id;
+      renderSolTable(); renderSolFocusBar();
+    };
+    tr.appendChild(th);
+
+    SOL_ANIONS.forEach(function (a, ai) {
+      const cell = cat.rows[ai];
+      const code = cell[0];
+      const td = el('td', 'sol-td sol-' + (code === 'Sl' ? 'sl' : code === '-' ? 'na' : code.toLowerCase()));
+      if (hlC === cat.id) td.classList.add('hl');
+      if (hlA === a.id) td.classList.add('hl');
+      if (hlC || hlA) { if (!(hlC === cat.id || hlA === a.id)) td.classList.add('fade'); }
+      if (kw && !hitRow[ai]) td.classList.add('fade');
+      td.appendChild(document.createTextNode(code === '-' ? '—' : code));
+      if (kw && hitRow[ai]) td.classList.add('match');
+      td.title = cat.name + ' + ' + a.name + '　→　' + cell[1];
+      td.onclick = function () { showSolCell(cat, a, cell); };
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  tbl.appendChild(tbody);
+  box.appendChild(tbl);
+}
+
+function renderSolFocusBar() {
+  const box = $('solFocusBar');
+  if (!box) return;
+  box.innerHTML = '';
+  const c = state.solHlC, a = state.solHlA;
+  if (!c && !a) return;
+  const wrap = el('div', 'hint g');
+  wrap.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;align-items:center';
+  let txt = '';
+  if (c && a) {
+    txt = L('高亮：', 'Highlighting: ');
+  } else if (c) {
+    txt = L('高亮整列：', 'Highlighting column: ');
+  } else {
+    txt = L('高亮整行：', 'Highlighting row: ');
+  }
+  wrap.appendChild(el('b', null, '🔎 ' + txt +
+    (c ? SOL_CATIONS.filter(function (x) { return x.id === c; })[0].name : '') +
+    (c && a ? '　×　' : '') +
+    (a ? SOL_ANIONS.filter(function (x) { return x.id === a; })[0].name : '')));
+  const cl = el('button', 'btn light sm', L('✕ 取消高亮', '✕ Clear'));
+  cl.onclick = function () { state.solHlC = null; state.solHlA = null; renderSolTable(); renderSolFocusBar(); };
+  wrap.appendChild(cl);
+  box.appendChild(wrap);
+}
+
+/* 通用彈窗（溶解度表專用） */
+function openSolModal(title, content) {
+  const root = $('modalRoot');
+  if (!root) return;
+  root.innerHTML = '';
+  const modal = el('div', 'modal');
+  modal.onclick = function (ev) { if (ev.target === modal) closeModal(); };
+  const box = el('div', 'modal-box');
+  const head = el('div', 'modal-head');
+  const ht = el('div');
+  ht.appendChild(el('h2', null, title));
+  ht.appendChild(el('div', 'en', L('點擊空白處或 ✕ 關閉', 'Click outside or ✕ to close')));
+  head.appendChild(ht);
+  const close = el('button', 'close-btn modal-close', '✕');
+  close.onclick = closeModal;
+  head.appendChild(close);
+  box.appendChild(head);
+  box.appendChild(content);
+  modal.appendChild(box);
+  root.appendChild(modal);
+}
+
+function showSolCell(cat, an, cell) {
+  const code = cell[0];
+  const meta = solCodeMeta(code);
+  const box = el('div');
+  const title = cat.name + ' + ' + an.name + '　→　' + cell[1];
+  const grid = el('div', 'info-grid');
+  /* 標籤直接給定英文，不要用 L(zh, 缺譯時回傳 zh) 的寫法——
+     那種寫法在詞典沒有該詞時會把中文當成英文輸出。 */
+  [['化學式', 'Formula', cell[1]],
+   ['溶解性', 'Solubility', L(meta.zh, meta.en)],
+   ['顏色外觀', 'Appearance', solT(cell[2])],
+   ['物質', 'Ions', cat.name + '　·　' + an.name]].forEach(function (p) {
+    const c = el('div', 'info-cell');
+    c.appendChild(el('div', 'k', L(p[0], p[1])));
+    c.appendChild(el('div', 'v', p[2]));
+    grid.appendChild(c);
+  });
+  box.appendChild(grid);
+  if (cell[3]) {
+    const t = el('div', 'hint');
+    t.style.marginTop = '12px';
+    t.appendChild(el('b', null, L('備註：', 'Note: ')));
+    t.appendChild(document.createTextNode(solT(cell[3])));
+    box.appendChild(t);
+  }
+  /* 離子方程式（生成沉澱時） */
+  if (code === 'I' || code === 'Sl') {
+    const eq = el('div', 'hint b');
+    eq.style.marginTop = '10px';
+    eq.appendChild(el('b', null, L('離子方程式：', 'Ionic equation: ')));
+    eq.appendChild(document.createTextNode(
+      cat.name + '(aq) + ' + an.name + '(aq) → ' + cell[1] + '(s)'));
+    box.appendChild(eq);
+  }
+  const btn = el('button', 'btn pri', L('在化合物圖鑑中搜尋', 'Search in Compounds'));
+  btn.style.marginTop = '14px';
+  btn.onclick = function () {
+    closeModal();
+    state.cpdCat = 'all';
+    renderCpdCats();
+  renderSol();
+    go('cpd');
+    $('cpdSearch').value = cell[1];
+    renderCompounds(cell[1]);
+  };
+  box.appendChild(btn);
+  openSolModal(L('溶解度：', 'Solubility: ') + title, box);
+}
+
+function renderSolRules() {
+  const box = $('solRules');
+  if (!box) return;
+  box.innerHTML = '';
+  const g = el('div', 'grid g2');
+  SOL_RULES.forEach(function (r) {
+    const d = el('div', 'card pad');
+    d.appendChild(el('h4', null, L(r.t, r.en))).style.cssText =
+      'font-size:15px;font-weight:800;margin-bottom:8px;color:var(--pr)';
+    d.appendChild(el('div', 'd', L(r.d, r.d2)));
+    g.appendChild(d);
+  });
+  box.appendChild(g);
+}
+
+function renderSolPpt() {
+  const box = $('solPpt');
+  if (!box) return;
+  box.innerHTML = '';
+  const kw = norm($('solSearch') ? $('solSearch').value : '');
+  const list = SOL_PPT.filter(function (p) {
+    return !kw || norm(p.f + p.c + p.use).indexOf(kw) >= 0;
+  });
+  if (!list.length) return;
+  const g = el('div', 'grid g3');
+  list.forEach(function (p) {
+    const d = el('div', 'card pad sol-ppt');
+    const top = el('div', 'sol-ppt-top');
+    const sw = el('span', 'swatch');
+    sw.style.background = PPT_COLOR[p.k] || '#94a3b8';
+    top.appendChild(sw);
+    top.appendChild(el('b', null, p.f));
+    d.appendChild(top);
+    d.appendChild(el('div', 'sol-ppt-c', L(p.c, solT(p.c))));
+    d.appendChild(el('div', 'sol-ppt-u', L(p.use, solT(p.use))));
+    g.appendChild(d);
+  });
+  box.appendChild(g);
+}
+
+function renderSol() {
+  /* 搜尋框 placeholder 依語言設定（模板內是中文） */
+  const si = $('solSearch');
+  if (si) {
+    si.placeholder = L('搜尋離子或物質（例：AgCl、硫酸鋇、Ba²⁺、OH⁻）',
+      'Search ions or substances (e.g. AgCl, BaSO₄, Ba²⁺, OH⁻)');
+  }
+  renderSolLegend();
+  renderSolTable();
+  renderSolFocusBar();
+  renderSolRules();
+  renderSolPpt();
+}
+
+const PPT_COLOR = {
+  white: '#ffffff', cream: '#fef3c7', yellow: '#fbbf24',
+  blue: '#3b82f6', green: '#22c55e', brown: '#92400e', black: '#1f2937'
+};
+
 function renderCpdCats() {
   const box = $('cpdCats');
   box.innerHTML = '';
@@ -8598,7 +9285,7 @@ function renderRouteLayers() {
     const n = (ORG_LINKS.filter(function (lk) { return L2.id === 'all' || lk.g === L2.id; })).length;
     const b = el('button', 'chip' + (state.routeLayer === L2.id ? ' on' : ''),
       L2.ic + ' ' + L(L2.t, L2.en));
-    b.title = L(L2.s, L2.en_s) + '　·　' + n + ' 條';
+    b.title = L(L2.s, L2.en_s) + '　·　' + n + (LANG === 'en' ? ' links' : ' 條');
     b.onclick = function () {
       state.routeLayer = L2.id;
       renderRouteLayers(); renderRoutesSVG(); renderRouteFocusBar();
@@ -8907,7 +9594,8 @@ function runSearch(raw) {
   if (!kw) {
     const e = el('div', 'empty');
     e.appendChild(el('span', 'big', '🔍'));
-    e.appendChild(document.createTextNode('輸入關鍵字開始搜尋，或點上方熱門關鍵字。'));
+    e.appendChild(document.createTextNode(L('輸入關鍵字開始搜尋，或點上方熱門關鍵字。',
+      'Type a keyword to start searching, or tap a suggested term above.')));
     box.appendChild(e);
     return;
   }
@@ -8915,10 +9603,11 @@ function runSearch(raw) {
 
   const ts = TOPICS.filter(function (t) { return norm(t.zh + t.en + t.code + t.exam).indexOf(kw) >= 0; });
   if (ts.length) {
-    const g = searchGroup('課題', '📘', ts.length);
+    const g = searchGroup(L('課題', 'Topics'), '📘', ts.length);
     ts.forEach(function (t) {
-      g.appendChild(resRow(t.code + '　' + t.zh + (t.part === 'E' ? '（選修）' : ''),
-        t.en + '　·　' + t.hours + ' 小時　·　' + t.exam, function () {
+      g.appendChild(resRow(tName2(t),
+        (LANG === 'en' ? t.en + '　·　' + t.hours + ' hours　·　' + tExam(t)
+                       : t.en + '　·　' + t.hours + ' 小時　·　' + t.exam), function () {
           state.cardFilter = t.id; renderCardFilter(); renderCards(''); go('cards');
         }));
     });
@@ -8934,11 +9623,12 @@ function runSearch(raw) {
     });
   });
   if (kcs.length) {
-    const g = searchGroup('知識點', '🗂', kcs.length);
+    const g = searchGroup(L('知識點', 'Key points'), '🗂', kcs.length);
     kcs.slice(0, 30).forEach(function (o) {
-      g.appendChild(resRow(o.c.title, (o.c.points[0] || ''), function () {
+      const pts = cardPoints(o.t.id, o.c);
+      g.appendChild(resRow(cardTitle(o.t.id, o.c), (pts[0] || ''), function () {
         state.cardFilter = o.t.id; renderCardFilter(); renderCards(o.c.title); go('cards');
-      }, o.t.code + ' ' + o.t.zh));
+      }, tName(o.t)));
     });
     box.appendChild(g); total += kcs.length;
   }
@@ -8950,11 +9640,12 @@ function runSearch(raw) {
     });
   });
   if (rs.length) {
-    const g = searchGroup('速查手冊', '📗', rs.length);
+    const g = searchGroup(L('速查手冊', 'Quick reference'), '📗', rs.length);
     rs.slice(0, 25).forEach(function (o) {
-      g.appendChild(resRow(o.it.name, o.it.detail, function () {
+      const _r = refF(o.it, o.g.cat);
+      g.appendChild(resRow(_r.name, _r.detail, function () {
         go('ref'); $('refSearch').value = raw; renderRef(raw);
-      }, o.g.cat));
+      }, catLabel(typeof EN_REF !== 'undefined' ? EN_REF : null, o.g.cat, o.g.cat) || o.g.cat));
     });
     box.appendChild(g); total += rs.length;
   }
@@ -8963,9 +9654,9 @@ function runSearch(raw) {
     return norm(e.sym + e.zh + e.en + elUse(e) + e.z).indexOf(kw) >= 0;
   });
   if (es.length) {
-    const g = searchGroup('元素', '🧪', es.length);
+    const g = searchGroup(L('元素', 'Elements'), '🧪', es.length);
     es.slice(0, 20).forEach(function (e) {
-      g.appendChild(resRow(L(e.zh, e.en) + '　' + e.sym + '　（原子序 ' + e.z + '）', elUse(e),
+      g.appendChild(resRow(L(e.zh, e.en) + '　' + e.sym + L('　（原子序 ' + e.z + '）', '　(atomic number ' + e.z + ')'), elUse(e),
         function () { openElementModal(e); }));
     });
     box.appendChild(g); total += es.length;
@@ -8975,8 +9666,9 @@ function runSearch(raw) {
     return norm(c.name + c.zh + c.color + c.use + c.test + c.state).indexOf(kw) >= 0;
   });
   if (cs.length) {
-    const g = searchGroup('化合物', '🎨', cs.length);
-    cs.slice(0, 25).forEach(function (c) {
+    const g = searchGroup(L('化合物', 'Compounds'), '🎨', cs.length);
+    cs.slice(0, 25).forEach(function (c0) {
+      const c = cpdF(c0);
       g.appendChild(resRow(c.name + '　' + c.zh, c.color + '　·　' + c.use, function () {
         go('cpd'); $('cpdSearch').value = raw; renderCompounds(raw);
       }));
@@ -8986,7 +9678,7 @@ function runSearch(raw) {
 
   const eqs = EQUATIONS.map(eqF).filter(function (e) { return norm(e.name + e.eq + e.note).indexOf(kw) >= 0; });
   if (eqs.length) {
-    const g = searchGroup('化學方程式', '⚖️', eqs.length);
+    const g = searchGroup(L('化學方程式', 'Chemical equations'), '⚖️', eqs.length);
     eqs.slice(0, 25).forEach(function (e) {
       g.appendChild(resRow(e.name, e.eq, function () {
         go('eqs'); $('eqSearch').value = raw; renderEquations(raw);
@@ -8999,8 +9691,9 @@ function runSearch(raw) {
     return norm(n.label + n.sub + n.example + n.desc + n.reactions.join('')).indexOf(kw) >= 0;
   });
   if (ons.length) {
-    const g = searchGroup('有機轉化', '🔄', ons.length);
-    ons.forEach(function (n) {
+    const g = searchGroup(L('有機轉化', 'Organic conversions'), '🔄', ons.length);
+    ons.forEach(function (n0) {
+      const n = routeNodeF(n0);
       g.appendChild(resRow(n.label + '　' + n.sub, n.example + '　·　' + n.desc, function () {
         state.routeNode = n.id; renderRoutesSVG(); renderRouteDetail(); go('routes');
       }));
@@ -9012,9 +9705,10 @@ function runSearch(raw) {
     return norm(q.q + q.o.join('') + q.e).indexOf(kw) >= 0;
   });
   if (qs.length) {
-    const g = searchGroup('練習題', '✏️', qs.length);
+    const g = searchGroup(L('練習題', 'Practice questions'), '✏️', qs.length);
     qs.slice(0, 12).forEach(function (q) {
-      g.appendChild(resRow(q.q, '答案：' + letter(q.a) + '. ' + q.o[q.a], function () { go('quiz'); },
+      const _q = qCfg(q);
+      g.appendChild(resRow(_q.q, L('答案：', 'Answer: ') + letter(_q.a) + '. ' + _q.o[_q.a], function () { go('quiz'); },
         topicName(q.t)));
     });
     box.appendChild(g); total += qs.length;
@@ -9051,7 +9745,7 @@ function openStats() {
   [['知識點掌握', cardsDoneN() + ' / ' + cardsTotal()],
    ['閃卡掌握', fKnown + ' / ' + FLASHCARDS.length],
    ['自測正確率', state.quiz.total ? Math.round(state.quiz.correct / state.quiz.total * 100) + '%' : '—'],
-   ['已作答', state.quiz.total + ' 題'],
+   [L('已作答', 'Answered'), state.quiz.total + (LANG === 'en' ? ' Q' : ' 題')],
    ['錯題本', state.wrongBook.length + L(' 題', ' Q')],
    ['重點標記', Object.keys(state.cardsStar).length + ' 項']].forEach(function (p) {
     const c = el('div', 'info-cell');
@@ -9062,8 +9756,8 @@ function openStats() {
   box.appendChild(grid);
 
   const tip = el('div', 'hint b');
-  tip.appendChild(el('b', null, '課題進度'));
-  tip.appendChild(document.createTextNode('（點擊前往該課題知識點）'));
+  tip.appendChild(el('b', null, L('課題進度', 'Topic progress')));
+  tip.appendChild(document.createTextNode(L('（點擊前往該課題知識點）', ' (tap to open that topic)')));
   box.appendChild(tip);
 
   TOPICS.forEach(function (t) {
@@ -9071,7 +9765,7 @@ function openStats() {
     const p = pr.total ? Math.round(pr.done / pr.total * 100) : 0;
     const row = el('div', 'wrong-item');
     row.style.cursor = 'pointer';
-    row.appendChild(el('div', 'wq', t.code + ' ' + t.zh + '　' + pr.done + '/' + pr.total + '　（' + p + '%）'));
+    row.appendChild(el('div', 'wq', tName(t) + '　' + pr.done + '/' + pr.total + '　（' + p + '%）'));
     const bar = el('div');
     bar.style.cssText = 'height:8px;border-radius:999px;overflow:hidden;background:rgba(19,26,38,.08);margin-top:8px';
     const f = el('i');
@@ -9168,6 +9862,7 @@ function bind() {
   deb('wrongSearch', function (v) { state.wrongPickKw = v; renderWrongPick(); });
   deb('ptSearch', function (v) { renderPTable(v); });
   deb('cpdSearch', function (v) { renderCompounds(v); });
+  deb('solSearch', function (v) { renderSolTable(); renderSolPpt(); });
   deb('eqSearch', function (v) { renderEquations(v); });
   deb('searchInput', function (v) { runSearch(v); });
 
